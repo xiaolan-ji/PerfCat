@@ -54,10 +54,9 @@ class CpuThread(QThread, Common):
                 start_time = time.time()
                 sleep_interval = 0.001
                 line = res.stdout.readline().decode('utf-8', 'ignore')
-
                 if name in line and "remote" not in line and "service" not in line:
                     if line != "":
-                        cpu = self.format_by_re('(\d{1,2})\%', line)
+                        cpu = self.format_by_re('(\d+)\%', line)
                         if len(cpu) == 0:
                             cpu = re.split('\s+', line)
                             if cpu[0] == "":

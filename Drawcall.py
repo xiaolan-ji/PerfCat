@@ -44,7 +44,7 @@ class DrawcallThread(QThread, Common):
                     line = res.stdout.readline().decode('utf-8', 'ignore')
                     # line = str(res.stdout.readline())
                     if 'No such file or directory' in line:
-                        print('No such file or directory')
+                        pass
                     else:
                         line = re.findall('Draw\scall\s\:\s(\d+)', line)
                         if line:

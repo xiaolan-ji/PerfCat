@@ -42,13 +42,15 @@ class TempeThread(QThread, Common):
                     cmd = "adb shell \"cat /sys/class/thermal/thermal_zone7/temp\""
                     res = self.execshell(cmd)
                     if res.poll() is None:
-                        line = res.stdout.readline().decode('utf-8', 'ignore')
-                        if 'No such file or directory' not in line:
-                            line = line[0:1]
+                        # line = res.stdout.readline().decode('utf-8', 'ignore')
+                        line = str(res.stdout.readline())
+                        if 'Permission' not in line and 'No such file or directory' not in line:
+                            print("temp")
+                            print(line)
+                            line = line[0:2]
                             line = int(line)
                             self.trigger.emit(line, self.btn_enable)
                             row += 1
-                            print(line)
                             self.sheet.write(row, 14, line)
 
 

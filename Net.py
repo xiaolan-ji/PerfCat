@@ -58,11 +58,14 @@ class NetThread(QThread, Common):
                 cmd_mem = "adb shell \"cat /proc/net/xt_qtaguid/stats | grep " + userId
                 res = self.execshell(cmd_mem)
 
-                while res.poll() is None:
-                    line = res.stdout.readline()
-                    if len(line) > 0:
-                        line = str(line)
-                        if '1' in line.split()[4]:
+                if res.poll() is None:
+                    # line = res.stdout.readline().decode('utf-8', 'ignore')
+                    line = str(res.stdout.readline())
+                    print(line)
+                    if 'No such file or directory' not in line:
+                        print("yes")
+                        # if '1' in line.split()[4]:
+                        if int(line.split()[5]) > 0:
                             if 'wlan' in line:
                                 if rx_wlan == 0 and tx_wlan == 0:
                                     wlan_rx_bytes = int(line.split()[5])
