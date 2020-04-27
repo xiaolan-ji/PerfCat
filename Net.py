@@ -1,7 +1,7 @@
 import re
 import time
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import *
 
 from Common import Common
 
@@ -10,7 +10,7 @@ class NetThread(QThread, Common):
 
     trigger = pyqtSignal(list, bool)
 
-    def __init__(self, excel, sheet, workbook, interval, durtime, package, lock):
+    def __init__(self, excel, sheet, workbook, interval, durtime, package):
         super(QThread, self).__init__()
         self.excel = excel
         self.interval = interval
@@ -19,7 +19,6 @@ class NetThread(QThread, Common):
         self.sheet = sheet
         self.workbook = workbook
         self.btn_enable = False
-        self.lock = lock
 
     def run(self):
         row = 1
@@ -41,8 +40,8 @@ class NetThread(QThread, Common):
         n = int(durtime / interval)
         name = self.get_package(self.package)
 
-        sleep_interval = interval
         avg_sum = 0
+        flag = '1' #读取流量命令标识
 
         cmd_mem = "adb shell dumpsys package " + name + " | findstr userId"
         wlan_res = self.execshell(cmd_mem)
@@ -58,14 +57,17 @@ class NetThread(QThread, Common):
                 cmd_mem = "adb shell \"cat /proc/net/xt_qtaguid/stats | grep " + userId
                 res = self.execshell(cmd_mem)
 
-                if res.poll() is None:
-                    # line = res.stdout.readline().decode('utf-8', 'ignore')
-                    line = str(res.stdout.readline())
-                    print(line)
+                while res.poll() is None:
+
+                    line = res.stdout.readline().decode('utf-8', 'ignore')
+                    print(str(line))
+                    if len(line) > 0 and int(line.split()[5]) == 0 and '1' in line.split()[4]:
+                        flag = '0'
+                    # elif len(line) > 0 and int(line.split()[5]) == 0 and '1' in line.split()[4]:
+                    #     flag = '0'
+
                     if 'No such file or directory' not in line:
-                        print("yes")
-                        # if '1' in line.split()[4]:
-                        if int(line.split()[5]) > 0:
+                        if line and int(line.split()[5]) > 0 and flag in line.split()[4]:
                             if 'wlan' in line:
                                 if rx_wlan == 0 and tx_wlan == 0:
                                     wlan_rx_bytes = int(line.split()[5])
@@ -75,13 +77,13 @@ class NetThread(QThread, Common):
                                 else:
                                     wlan_rx_bytes = int(line.split()[5])
                                     wlan_tx_bytes = int(line.split()[7])
-                                    wlan_recieve = (wlan_rx_bytes - rx_wlan)/1024
-                                    wlan_send = (wlan_tx_bytes - tx_wlan)/1024
+                                    wlan_recieve = (wlan_rx_bytes - rx_wlan) / 1024
+                                    wlan_send = (wlan_tx_bytes - tx_wlan) / 1024
                                     if wlan_recieve > 0 and wlan_send > 0:
-                                        wlan_recspeed = round(wlan_recieve/interval, 4)
-                                        wlan_sendspeed = round(wlan_send/interval, 4)
-                                        wlan_total_recieve += wlan_recieve/1024
-                                        wlan_total_send += wlan_send/1024
+                                        wlan_recspeed = round(wlan_recieve / interval, 4)
+                                        wlan_sendspeed = round(wlan_send / interval, 4)
+                                        wlan_total_recieve += wlan_recieve / 1024
+                                        wlan_total_send += wlan_send / 1024
                                         wlan_total_send = round(wlan_total_send, 4)
                                         wlan_total_recieve = round(wlan_total_recieve, 4)
                                         wlan_total = wlan_total_recieve + wlan_total_send
@@ -116,8 +118,8 @@ class NetThread(QThread, Common):
                                     rmnet_recieve = (rmnet_rx_bytes - rx_rmnet) / 1024
                                     rmnet_send = (rmnet_tx_bytes - tx_rmnet) / 1024
                                     if rmnet_recieve > 0 and rmnet_send > 0:
-                                        rmnet_recspeed = round(rmnet_recieve/interval, 4)
-                                        rmnet_sendspeed = round(rmnet_send/interval, 4)
+                                        rmnet_recspeed = round(rmnet_recieve / interval, 4)
+                                        rmnet_sendspeed = round(rmnet_send / interval, 4)
                                         rmnet_total_recieve += rmnet_recieve / 1024
                                         rmnet_total_send += rmnet_send / 1024
                                         rmnet_total_send = round(rmnet_total_send, 4)
@@ -151,3 +153,5 @@ class NetThread(QThread, Common):
         self.btn_enable = True
         self.trigger.emit([0,0,0,0,0], self.btn_enable)
         self.workbook.save(self.excel)
+
+

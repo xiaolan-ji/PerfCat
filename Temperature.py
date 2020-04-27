@@ -1,8 +1,7 @@
 import re
 import time
 from time import sleep
-
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import *
 
 from Common import Common
 
@@ -11,7 +10,7 @@ class TempeThread(QThread, Common):
 
     trigger = pyqtSignal(int, bool)
 
-    def __init__(self, excel, sheet, workbook, interval, durtime, package, lock):
+    def __init__(self, excel, sheet, workbook, interval, durtime, package):
         super(QThread, self).__init__()
         self.excel = excel
         self.interval = interval
@@ -20,7 +19,6 @@ class TempeThread(QThread, Common):
         self.sheet = sheet
         self.workbook = workbook
         self.btn_enable = False
-        self.lock = lock
 
     def run(self):
         row = 1
@@ -42,11 +40,8 @@ class TempeThread(QThread, Common):
                     cmd = "adb shell \"cat /sys/class/thermal/thermal_zone7/temp\""
                     res = self.execshell(cmd)
                     if res.poll() is None:
-                        # line = res.stdout.readline().decode('utf-8', 'ignore')
-                        line = str(res.stdout.readline())
+                        line = res.stdout.readline().decode('utf-8', 'ignore')
                         if 'Permission' not in line and 'No such file or directory' not in line:
-                            print("temp")
-                            print(line)
                             line = line[0:2]
                             line = int(line)
                             self.trigger.emit(line, self.btn_enable)

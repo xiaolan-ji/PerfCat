@@ -22,6 +22,7 @@ from Temperature import TempeThread
 
 
 class MyWindow(QWidget):
+    lock = 'cpu'
 
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
@@ -35,7 +36,6 @@ class MyWindow(QWidget):
         ]
         self.excel_path = "D:\PerfReport"
         self.create_excel()
-        self.lock = QMutex()
         self.getData = 0
 
     def init_Ui(self):
@@ -231,6 +231,7 @@ class MyWindow(QWidget):
         self.label_tempe.setText("cpu温度：")
         self.label_battery.setText("实时电量：")
 
+
     # 打开存储文件夹
     def open_dir_fun(self):
         QFileDialog.getOpenFileNames(self, "打开...", self.excel_path, "All Files(*)")
@@ -306,20 +307,20 @@ class MyWindow(QWidget):
             path = "D:\\PerfReport"
             self.com.mkdir(path)
 
-            self.cpu_thread = CpuThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package,
-                                        self.lock)
-            self.mem_thread = MemThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package,
-                                        self.lock)
-            self.fps_thread = FpsThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package,
-                                        self.lock)
-            self.net_thread = NetThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package,
-                                        self.lock)
-            self.tempe_thread = TempeThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package,
-                                        self.lock)
-            self.battery_thread = BatteryThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package,
-                                        self.lock)
-            self.drawcall_thread = DrawcallThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package,
-                                        self.lock)
+            self.cpu_thread = CpuThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
+                                        )
+            self.mem_thread = MemThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
+                                        )
+            self.fps_thread = FpsThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
+                                        )
+            self.net_thread = NetThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
+                                        )
+            self.tempe_thread = TempeThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
+                                        )
+            self.battery_thread = BatteryThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
+                                        )
+            self.drawcall_thread = DrawcallThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
+                                        )
 
             self.mem_thread.trigger.connect(self.stop_get_mem)
             self.cpu_thread.trigger.connect(self.stop_get_cpu)

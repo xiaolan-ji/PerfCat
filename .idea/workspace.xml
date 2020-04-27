@@ -2,11 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c710b0b4-4e4a-4828-b51e-7595e13c7c2e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Battery.py" beforeDir="false" afterPath="$PROJECT_DIR$/Battery.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Common.py" beforeDir="false" afterPath="$PROJECT_DIR$/Common.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cpu.py" beforeDir="false" afterPath="$PROJECT_DIR$/Cpu.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Drawcall.py" beforeDir="false" afterPath="$PROJECT_DIR$/Drawcall.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fps.py" beforeDir="false" afterPath="$PROJECT_DIR$/Fps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mem.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Net.py" beforeDir="false" afterPath="$PROJECT_DIR$/Net.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PerfCat.py" beforeDir="false" afterPath="$PROJECT_DIR$/PerfCat.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Temperature.py" beforeDir="false" afterPath="$PROJECT_DIR$/Temperature.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
     </list>
@@ -15,6 +19,13 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -139,5 +150,16 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

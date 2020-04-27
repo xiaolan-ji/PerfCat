@@ -1,9 +1,7 @@
 import re
 import time
 from time import sleep
-
-from PyQt5.QtCore import QThread, pyqtSignal
-
+from PyQt5.QtCore import *
 from Common import Common
 
 # 采集内存多线程类
@@ -11,7 +9,7 @@ class DrawcallThread(QThread, Common):
 
     trigger = pyqtSignal(int, bool)
 
-    def __init__(self, excel, sheet, workbook, interval, durtime, package, lock):
+    def __init__(self, excel, sheet, workbook, interval, durtime, package):
         super(QThread, self).__init__()
         self.excel = excel
         self.interval = interval
@@ -20,7 +18,6 @@ class DrawcallThread(QThread, Common):
         self.sheet = sheet
         self.workbook = workbook
         self.btn_enable = False
-        self.lock = lock
 
     def run(self):
         row = 1

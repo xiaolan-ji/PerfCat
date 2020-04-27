@@ -4,6 +4,7 @@ import os
 import xlrd
 import xlwt
 from xlutils.copy import copy
+import copy
 
 
 class Common():
@@ -12,12 +13,17 @@ class Common():
 
         self.title = [u"COUNT", u"CPU(%)", u"MEM(M)"]
         self.data = []
+        self.lock = ['cpu']
 
+    # 获得锁标识
+    def getLock(self, t):
+        print(t + 'get' + str(id(self.lock)))
+        return self.lock[0]
 
-    # 读取excel表格
-    def read_excel(self, excel_path):
-        excel_path = "D:\\" + excel_path + ".xls"
-        return pd.read_excel(excel_path)
+    # 设置锁标识
+    def setLock(self, lock, t):
+        self.lock[:] = lock[:]
+        print(t + 'set' + str(id(self.lock)))
 
     # 将传入的字符串按照指定规定的正则匹配提取字符串
     def format_by_re(self, pattern, line):

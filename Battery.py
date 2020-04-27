@@ -1,8 +1,7 @@
 import re
 import time
 from time import sleep
-
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import *
 
 from Common import Common
 
@@ -11,7 +10,7 @@ class BatteryThread(QThread, Common):
 
     trigger = pyqtSignal(int, bool)
 
-    def __init__(self, excel, sheet, workbook, interval, durtime, package, lock):
+    def __init__(self, excel, sheet, workbook, interval, durtime, package):
         super(QThread, self).__init__()
         self.excel = excel
         self.interval = interval
@@ -20,7 +19,6 @@ class BatteryThread(QThread, Common):
         self.sheet = sheet
         self.workbook = workbook
         self.btn_enable = False
-        self.lock = lock
 
     def run(self):
         row = 1
@@ -37,7 +35,6 @@ class BatteryThread(QThread, Common):
             sleep_interval = 0.001
             start_time = time.time()
             if self.check_adb(self.package) == 1:
-                # cmd_fps = "adb shell service call SurfaceFlinger 1013"
                 cmd = "adb shell dumpsys battery"
                 res = self.execshell(cmd)
                 while res.poll() is None:
