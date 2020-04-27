@@ -10,7 +10,7 @@ class NetThread(QThread, Common):
 
     trigger = pyqtSignal(list, bool)
 
-    def __init__(self, excel, sheet, workbook, interval, durtime, package):
+    def __init__(self, excel, sheet, workbook, interval, durtime, package, lock):
         super(QThread, self).__init__()
         self.excel = excel
         self.interval = interval
@@ -19,6 +19,7 @@ class NetThread(QThread, Common):
         self.sheet = sheet
         self.workbook = workbook
         self.btn_enable = False
+        self.lock = lock
 
     def run(self):
         row = 1
@@ -50,6 +51,7 @@ class NetThread(QThread, Common):
 
         for i in range(n+1):
             if self.check_adb(self.package) == 1:
+                self.lock['net'].acquire()
                 start_time = time.time()
                 sleep_interval = 0.001
                 wlan_res = []
@@ -60,14 +62,14 @@ class NetThread(QThread, Common):
                 while res.poll() is None:
 
                     line = res.stdout.readline().decode('utf-8', 'ignore')
-                    print(str(line))
                     if len(line) > 0 and int(line.split()[5]) == 0 and '1' in line.split()[4]:
                         flag = '0'
                     # elif len(line) > 0 and int(line.split()[5]) == 0 and '1' in line.split()[4]:
                     #     flag = '0'
 
                     if 'No such file or directory' not in line:
-                        if line and int(line.split()[5]) > 0 and flag in line.split()[4]:
+                        # if line and int(line.split()[5]) > 0 and flag in line.split()[4]:
+                        if line and int(line.split()[5]) > 0:
                             if 'wlan' in line:
                                 if rx_wlan == 0 and tx_wlan == 0:
                                     wlan_rx_bytes = int(line.split()[5])
@@ -97,15 +99,15 @@ class NetThread(QThread, Common):
                                         wlan_res.append(wlan_total_send)
                                         wlan_res.append(wlan_total)
 
-                                        self.trigger.emit(wlan_res, self.btn_enable)
 
+                                        self.trigger.emit(wlan_res, self.btn_enable)
                                         row += 1
                                         self.sheet.write(row, 4, wlan_recspeed)
                                         self.sheet.write(row, 5, wlan_sendspeed)
                                         self.sheet.write(row, 6, wlan_total_recieve)
                                         self.sheet.write(row, 7, wlan_total_send)
                                         self.sheet.write(row, 8, wlan_total)
-                                        # self.workbook.save(self.excel)
+
                             if 'rmnet' in line:
                                 if rx_rmnet == 0 and tx_rmnet == 0:
                                     rmnet_rx_bytes = int(line.split()[5])
@@ -135,7 +137,6 @@ class NetThread(QThread, Common):
                                         rmnet_res.append(rmnet_total)
 
                                         self.trigger.emit(rmnet_res, self.btn_enable)
-
                                         row += 1
                                         self.sheet.write(row, 9, rmnet_recspeed)
                                         self.sheet.write(row, 10, rmnet_sendspeed)
@@ -143,15 +144,23 @@ class NetThread(QThread, Common):
                                         self.sheet.write(row, 12, rmnet_total_send)
                                         self.sheet.write(row, 13, rmnet_total)
 
+
                 while (time.time() - start_time) * 1000000 <= interval * 1000000:
                     sleep_interval += 0.0000001
                     time.sleep(sleep_interval)
                 end_time = time.time()
                 avg = (end_time - start_time) * 1000
                 avg_sum += avg
-                print("net为%f" % (avg_sum / (i + 1)))
-        self.btn_enable = True
-        self.trigger.emit([0,0,0,0,0], self.btn_enable)
-        self.workbook.save(self.excel)
+                # print("net为%f" % (avg_sum / (i + 1)))
+                print("net %d" % row)
+                self.lock['cpu'].release()
+                cpu_mark = self.lock['cpu'].available()
+                mark = self.lock['net'].available()
+                print("net av %d" %cpu_mark)
+        if mark <= 1:
+            # print(mark)
+            self.btn_enable = True
+            self.trigger.emit([0,0,0,0,0], self.btn_enable)
+        # self.workbook.save(self.excel)
 
 

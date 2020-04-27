@@ -4,12 +4,12 @@ from time import sleep
 from PyQt5.QtCore import *
 from Common import Common
 
-# 采集内存多线程类
+
 class DrawcallThread(QThread, Common):
 
     trigger = pyqtSignal(int, bool)
 
-    def __init__(self, excel, sheet, workbook, interval, durtime, package):
+    def __init__(self, excel, sheet, workbook, interval, durtime, package, lock):
         super(QThread, self).__init__()
         self.excel = excel
         self.interval = interval
@@ -18,6 +18,7 @@ class DrawcallThread(QThread, Common):
         self.sheet = sheet
         self.workbook = workbook
         self.btn_enable = False
+        self.lock = lock
 
     def run(self):
         row = 1
@@ -34,6 +35,7 @@ class DrawcallThread(QThread, Common):
             sleep_interval = 0.001
             start_time = time.time()
             if self.check_adb(self.package) == 1:
+
                 # cmd_fps = "adb shell service call SurfaceFlinger 1013"
                 cmd = "adb shell \"cat /sdcard/jjlog_fps.log\""
                 res = self.execshell(cmd)
@@ -41,23 +43,26 @@ class DrawcallThread(QThread, Common):
                     line = res.stdout.readline().decode('utf-8', 'ignore')
                     # line = str(res.stdout.readline())
                     if 'No such file or directory' in line:
-                        pass
+                        line = 0
                     else:
                         line = re.findall('Draw\scall\s\:\s(\d+)', line)
                         if line:
                             line = line.pop()
                             line = int(line)
+
+                            self.lock['drawcall'].acquire()
                             self.trigger.emit(line, self.btn_enable)
                             row += 1
-                            self.sheet.write(row, 15, line)
-
+                    self.sheet.write(row, 15, line)
+                    print("drawcall %d" % row)
+                    self.lock['net'].release()
 
                 while (time.time()-start_time)*1000000 <= interval * 1000000:
                     sleep_interval += 0.0000001
                     sleep(sleep_interval)
                 end_time = time.time()
                 avg = (end_time-start_time)*1000
-                print("Drawcall为%f" % avg)
+                # print("Drawcall为%f" % avg)
         self.btn_enable = True
         self.trigger.emit(0, self.btn_enable)
-        self.workbook.save(self.excel)
+        # self.workbook.save(self.excel)

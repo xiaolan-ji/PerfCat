@@ -1,10 +1,6 @@
-# 获取cpu多线程类
 import re
 import time
-import copy
-
 from PyQt5.QtCore import *
-
 from Common import Common
 
 
@@ -12,7 +8,7 @@ class CpuThread(QThread, Common):
 
     trigger = pyqtSignal(str, bool)
 
-    def __init__(self, excel, sheet, workbook, interval, durtime, package):
+    def __init__(self, excel, sheet, workbook, interval, durtime, package, lock):
         super(QThread, self).__init__()
         self.excel = excel
         self.interval = interval
@@ -21,6 +17,7 @@ class CpuThread(QThread, Common):
         self.sheet = sheet
         self.workbook = workbook
         self.btn_enable = False
+        self.lock = lock
 
     def run(self):
         row = 1
@@ -46,12 +43,12 @@ class CpuThread(QThread, Common):
             while cpuInfo_res.poll() is None:
                 cpuInfo = cpuInfo_res.stdout.readline().decode('utf-8', 'ignore')
                 if "cpu cores" in cpuInfo:
-                    print(cpuInfo)
                     cpuCore = int(re.findall("cpu cores\\t\:\s(\S*)", cpuInfo).pop())
                 elif "CPU architecture" in cpuInfo:
                     cpuCore = int(re.findall("CPU architecture:\s(\d)", cpuInfo).pop())
 
             while res.poll() is None:
+
                 start_time = time.time()
                 sleep_interval = 0.001
                 line = res.stdout.readline().decode('utf-8', 'ignore')
@@ -68,18 +65,24 @@ class CpuThread(QThread, Common):
                             cpu = str(round(cpu, 1))
                         else:
                             cpu = cpu.pop()
+                        self.lock['cpu'].acquire()
+
                         self.trigger.emit(cpu, self.btn_enable)
                         count += 1
                         row += 1
                         self.sheet.write(row, 0, count)
                         self.sheet.write(row, 1, float(cpu))
+                        print("#####cpu %d#####" %row)
+                        self.lock['fps'].release()
 
                         while (time.time() - start_time) * 1000000 <= interval_time * 1000000:
                             sleep_interval += 0.0000001
                             time.sleep(sleep_interval)
                         end_time = time.time()
-                        print("cpu为%f" % (end_time * 1000 - start_time * 1000))
+                        # print("#####cpu为%f######" % (end_time * 1000 - start_time * 1000))
             self.btn_enable = True
             self.trigger.emit('0', self.btn_enable)
             self.workbook.save(self.excel)
+
+
 

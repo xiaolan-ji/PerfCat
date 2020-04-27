@@ -5,7 +5,7 @@ from queue import Queue
 import xlrd
 import xlwt
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QMutex, QMutexLocker
+from PyQt5.QtCore import QMutex, QMutexLocker, QSemaphore
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import *
 from xlutils.copy import copy
@@ -22,7 +22,6 @@ from Temperature import TempeThread
 
 
 class MyWindow(QWidget):
-    lock = 'cpu'
 
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
@@ -37,6 +36,23 @@ class MyWindow(QWidget):
         self.excel_path = "D:\PerfReport"
         self.create_excel()
         self.getData = 0
+
+        BufferSize = 1 #同时并发的线程数
+        CpuS = QSemaphore(BufferSize) #cpu并发锁
+        FpsS = QSemaphore(0)
+        DrawcallS = QSemaphore(0)
+        NetS = QSemaphore(0)
+        MemS = QSemaphore(0)
+        TempS = QSemaphore(0)
+        BatteryS = QSemaphore(0)
+        self.lock = {} #并发锁词典
+        self.lock['cpu'] = CpuS
+        self.lock['fps'] = FpsS
+        self.lock['drawcall'] = DrawcallS
+        self.lock['net'] = NetS
+        self.lock['mem'] = MemS
+        self.lock['temp'] = TempS
+        self.lock['battery'] = BatteryS
 
     def init_Ui(self):
         self.setWindowTitle('性能测试自动化工具')
@@ -308,19 +324,19 @@ class MyWindow(QWidget):
             self.com.mkdir(path)
 
             self.cpu_thread = CpuThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
-                                        )
+                                        , self.lock)
             self.mem_thread = MemThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
-                                        )
+                                        , self.lock)
             self.fps_thread = FpsThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
-                                        )
+                                        , self.lock)
             self.net_thread = NetThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
-                                        )
+                                        , self.lock)
             self.tempe_thread = TempeThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
-                                        )
+                                        , self.lock)
             self.battery_thread = BatteryThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
-                                        )
+                                        , self.lock)
             self.drawcall_thread = DrawcallThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
-                                        )
+                                        , self.lock)
 
             self.mem_thread.trigger.connect(self.stop_get_mem)
             self.cpu_thread.trigger.connect(self.stop_get_cpu)
@@ -330,52 +346,58 @@ class MyWindow(QWidget):
             self.battery_thread.trigger.connect(self.stop_get_battery)
             self.drawcall_thread.trigger.connect(self.stop_get_drawcall)
 
-            self.cpu_thread.start()
-            self.mem_thread.start()
-            self.fps_thread.start()
-            self.net_thread.start()
-            self.tempe_thread.start()
-            self.battery_thread.start()
-            self.drawcall_thread.start()
+            QueThread = Queue()
+            QueThread.put(self.cpu_thread)
+            QueThread.put(self.fps_thread)
+            QueThread.put(self.battery_thread)
+            QueThread.put(self.mem_thread)
+            QueThread.put(self.tempe_thread)
+            QueThread.put(self.drawcall_thread)
+            QueThread.put(self.net_thread)
+
+            while not QueThread.empty():
+                QueThread.get().start()
+
+
 
     # 电量采集槽函数
     def stop_get_battery(self, int, bool):
-        print("电量采集")
+        # print("电量采集")
         self.battery.setText(str(int))
         self.get_cpu.setEnabled(bool)
 
     # drawcall采集槽函数
     def stop_get_drawcall(self, int, bool):
-        print("drawcall采集")
+        # print("drawcall采集")
         self.drawcall.setText(str(int))
         self.get_cpu.setEnabled(bool)
 
     # 终止温度采集槽函数
     def stop_get_tempe(self, int, bool):
-        print("温度采集")
+        # print("温度采集")
         self.tempe.setText(str(int))
         self.get_cpu.setEnabled(bool)
 
     # 终止cpu采集槽函数
     def stop_get_cpu(self, str, bool):
-        print("cpu采集")
+        # print("cpu采集")
         self.cpu_data.setText(str)
         self.get_cpu.setEnabled(bool)
 
     # 内存采集槽函数
     def stop_get_mem(self, float, bool):
-        print("内存采集")
+        # print("内存采集")
         self.mem_data.setText(str(float))
         self.get_cpu.setEnabled(bool)
 
     # fps采集槽函数
     def stop_get_fps(self, float, bool):
-        print("fps采集")
+        # print("fps采集")
         self.fps.setText(str(float))
 
     # net采集槽函数
     def stop_get_net(self, list, bool):
-        print("流量采集")
+        # print("流量采集")
         self.get_cpu.setEnabled(bool)
         self.recieve.setText(str(list[0]) + 'Kb/s')
         self.send.setText(str(list[1]) + 'Kb/s')
