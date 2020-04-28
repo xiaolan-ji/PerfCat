@@ -49,11 +49,11 @@ class NetThread(QThread, Common):
         userId = str(wlan_res.stdout.readline())
         userId = re.findall('userId=(\d+)', userId).pop()
 
-        for i in range(n+1):
+        for i in range(n):
+            start_time = time.time()
+            sleep_interval = 0.001
             if self.check_adb(self.package) == 1:
                 self.lock['net'].acquire()
-                start_time = time.time()
-                sleep_interval = 0.001
                 wlan_res = []
                 rmnet_res = []
                 cmd_mem = "adb shell \"cat /proc/net/xt_qtaguid/stats | grep " + userId
@@ -62,14 +62,14 @@ class NetThread(QThread, Common):
                 while res.poll() is None:
 
                     line = res.stdout.readline().decode('utf-8', 'ignore')
-                    if len(line) > 0 and int(line.split()[5]) == 0 and '1' in line.split()[4]:
-                        flag = '0'
+                    # if len(line) > 0 and int(line.split()[5]) == 0 and '1' in line.split()[4]:
+                    #     flag = '0'
                     # elif len(line) > 0 and int(line.split()[5]) == 0 and '1' in line.split()[4]:
                     #     flag = '0'
 
                     if 'No such file or directory' not in line:
                         # if line and int(line.split()[5]) > 0 and flag in line.split()[4]:
-                        if line and int(line.split()[5]) > 0:
+                        if len(line) > 0 and '1' in line.split()[4]:
                             if 'wlan' in line:
                                 if rx_wlan == 0 and tx_wlan == 0:
                                     wlan_rx_bytes = int(line.split()[5])
@@ -107,6 +107,8 @@ class NetThread(QThread, Common):
                                         self.sheet.write(row, 6, wlan_total_recieve)
                                         self.sheet.write(row, 7, wlan_total_send)
                                         self.sheet.write(row, 8, wlan_total)
+                                        print("net %d" % row)
+                                self.lock['drawcall'].release()
 
                             if 'rmnet' in line:
                                 if rx_rmnet == 0 and tx_rmnet == 0:
@@ -143,6 +145,7 @@ class NetThread(QThread, Common):
                                         self.sheet.write(row, 11, rmnet_total_recieve)
                                         self.sheet.write(row, 12, rmnet_total_send)
                                         self.sheet.write(row, 13, rmnet_total)
+                                        self.lock['cpu'].release()
 
 
                 while (time.time() - start_time) * 1000000 <= interval * 1000000:
@@ -152,15 +155,11 @@ class NetThread(QThread, Common):
                 avg = (end_time - start_time) * 1000
                 avg_sum += avg
                 # print("net为%f" % (avg_sum / (i + 1)))
-                print("net %d" % row)
-                self.lock['cpu'].release()
-                cpu_mark = self.lock['cpu'].available()
-                mark = self.lock['net'].available()
-                print("net av %d" %cpu_mark)
-        if mark <= 1:
-            # print(mark)
-            self.btn_enable = True
-            self.trigger.emit([0,0,0,0,0], self.btn_enable)
+
+
+
+        self.btn_enable = True
+        self.trigger.emit([0,0,0,0,0], self.btn_enable)
         # self.workbook.save(self.excel)
 
 

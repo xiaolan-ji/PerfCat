@@ -58,6 +58,7 @@ class BatteryThread(QThread, Common):
                 end_time = time.time()
                 avg = (end_time-start_time)*1000
                 # print("Battery为%f" % avg)
+
         self.btn_enable = True
         self.trigger.emit(0, self.btn_enable)
         # self.workbook.save(self.excel)

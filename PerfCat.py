@@ -38,7 +38,7 @@ class MyWindow(QWidget):
         self.getData = 0
 
         BufferSize = 1 #同时并发的线程数
-        CpuS = QSemaphore(BufferSize) #cpu并发锁
+        CpuS = QSemaphore(BufferSize)  # cpu并发锁
         FpsS = QSemaphore(0)
         DrawcallS = QSemaphore(0)
         NetS = QSemaphore(0)
@@ -224,7 +224,7 @@ class MyWindow(QWidget):
         self.test_package.setItemText(5, "JJ麻将")
         self.test_package.setItemText(6, "JJ象棋")
         self.label_2.setText("数据采集间隔：")
-        self.interval_time.setItemText(0, "1s")
+        self.interval_time.setItemText(0, "2s")
         self.interval_time.setItemText(1, "3s")
         self.interval_time.setItemText(2, "5s")
         self.interval_time.setItemText(3, "10s")
@@ -352,8 +352,9 @@ class MyWindow(QWidget):
             QueThread.put(self.battery_thread)
             QueThread.put(self.mem_thread)
             QueThread.put(self.tempe_thread)
-            QueThread.put(self.drawcall_thread)
             QueThread.put(self.net_thread)
+            QueThread.put(self.drawcall_thread)
+
 
             while not QueThread.empty():
                 QueThread.get().start()

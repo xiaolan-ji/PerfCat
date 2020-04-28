@@ -36,7 +36,7 @@ class CpuThread(QThread, Common):
         cmd_cpu = "adb shell top -n " + n + " -d " + interval + " | find \""+name+"\""
         if self.check_adb(self.package) == 1:
             res = self.execshell(cmd_cpu)
-
+            # self.lock['cpu'].acquire()
             cpuInfo_res = self.execshell("adb shell \"cat /proc/cpuinfo\"")
 
             #获取cpu核数
@@ -65,8 +65,8 @@ class CpuThread(QThread, Common):
                             cpu = str(round(cpu, 1))
                         else:
                             cpu = cpu.pop()
-                        self.lock['cpu'].acquire()
 
+                        self.lock['cpu'].acquire()
                         self.trigger.emit(cpu, self.btn_enable)
                         count += 1
                         row += 1
@@ -80,6 +80,7 @@ class CpuThread(QThread, Common):
                             time.sleep(sleep_interval)
                         end_time = time.time()
                         # print("#####cpu为%f######" % (end_time * 1000 - start_time * 1000))
+
             self.btn_enable = True
             self.trigger.emit('0', self.btn_enable)
             self.workbook.save(self.excel)

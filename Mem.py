@@ -32,13 +32,12 @@ class MemThread(QThread, Common):
         name = self.get_package(self.package)
 
         for i in range(n):
+            start_time = time.time()
+            sleep_interval = 0.001
             if self.check_adb(self.package) == 1:
-
                 row += 1
                 cmd_mem = "adb shell dumpsys meminfo " + name
                 res = self.execshell(cmd_mem)
-                start_time = time.time()
-                sleep_interval = 0.001
 
                 while res.poll() is None:
                     line = res.stdout.readline().decode('utf-8', 'ignore')
@@ -51,7 +50,6 @@ class MemThread(QThread, Common):
                                 mem = round(mem, 2)
                                 # mem = format(mem, '.2f')
                                 mem = float(mem)
-
                                 self.lock['mem'].acquire()
                                 self.trigger.emit(mem, self.btn_enable)
                                 self.sheet.write(row, 2, mem)
@@ -64,6 +62,7 @@ class MemThread(QThread, Common):
                 end_time = time.time()
                 avg = (end_time - start_time) * 1000
                 # print("内存为%f" % avg)
+
         self.btn_enable = True
         self.trigger.emit(0, self.btn_enable)
         print("save")

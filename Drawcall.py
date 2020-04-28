@@ -43,7 +43,8 @@ class DrawcallThread(QThread, Common):
                     line = res.stdout.readline().decode('utf-8', 'ignore')
                     # line = str(res.stdout.readline())
                     if 'No such file or directory' in line:
-                        line = 0
+                        if self.lock['drawcall'].tryAcquire():
+                            self.lock['cpu'].release()
                     else:
                         line = re.findall('Draw\scall\s\:\s(\d+)', line)
                         if line:
@@ -53,9 +54,10 @@ class DrawcallThread(QThread, Common):
                             self.lock['drawcall'].acquire()
                             self.trigger.emit(line, self.btn_enable)
                             row += 1
-                    self.sheet.write(row, 15, line)
-                    print("drawcall %d" % row)
-                    self.lock['net'].release()
+                            self.sheet.write(row, 15, line)
+                            print("drawcall %d" % row)
+                            self.lock['cpu'].release()
+
 
                 while (time.time()-start_time)*1000000 <= interval * 1000000:
                     sleep_interval += 0.0000001
@@ -65,4 +67,4 @@ class DrawcallThread(QThread, Common):
                 # print("Drawcall为%f" % avg)
         self.btn_enable = True
         self.trigger.emit(0, self.btn_enable)
-        # self.workbook.save(self.excel)
+        self.workbook.save(self.excel)

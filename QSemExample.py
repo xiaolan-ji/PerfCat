@@ -3,7 +3,7 @@ from time import sleep
 from PyQt5.QtCore import *
 
 DataSize = 30
-BufferSize = 9
+BufferSize = 3
 ps = QSemaphore(BufferSize)
 ds = QSemaphore(0)
 cs = QSemaphore(0)
