@@ -33,10 +33,11 @@ class CpuThread(QThread, Common):
 
         name = self.get_package(self.package)
         interval = str(interval)
-        cmd_cpu = "adb shell top -n " + n + " -d " + interval + " | find \""+name+"\""
+        # cmd_cpu = "adb shell top -n " + n + " -d " + interval + " | find \"" + name + "\""
+        cmd_cpu = "adb shell top -n " + n + " -d " + interval + " | find \"" + name + "\""
+
         if self.check_adb(self.package) == 1:
             res = self.execshell(cmd_cpu)
-            # self.lock['cpu'].acquire()
             cpuInfo_res = self.execshell("adb shell \"cat /proc/cpuinfo\"")
 
             #获取cpu核数
@@ -48,7 +49,6 @@ class CpuThread(QThread, Common):
                     cpuCore = int(re.findall("CPU architecture:\s(\d)", cpuInfo).pop())
 
             while res.poll() is None:
-
                 start_time = time.time()
                 sleep_interval = 0.001
                 line = res.stdout.readline().decode('utf-8', 'ignore')

@@ -44,7 +44,7 @@ class NetThread(QThread, Common):
         avg_sum = 0
         flag = '1' #读取流量命令标识
 
-        cmd_mem = "adb shell dumpsys package " + name + " | findstr userId"
+        cmd_mem = "adb shell \" dumpsys package " + name + " | grep \"userId\"\""
         wlan_res = self.execshell(cmd_mem)
         userId = str(wlan_res.stdout.readline())
         userId = re.findall('userId=(\d+)', userId).pop()
@@ -68,14 +68,23 @@ class NetThread(QThread, Common):
                     #     flag = '0'
 
                     if 'No such file or directory' not in line:
-                        # if line and int(line.split()[5]) > 0 and flag in line.split()[4]:
-                        if len(line) > 0 and '1' in line.split()[4]:
+                        if line and int(line.split()[17]) == 18720:
+                        # if len(line) > 0 and '1' in line.split()[4]:
                             if 'wlan' in line:
+                                row += 1
                                 if rx_wlan == 0 and tx_wlan == 0:
                                     wlan_rx_bytes = int(line.split()[5])
                                     wlan_tx_bytes = int(line.split()[7])
                                     rx_wlan = wlan_rx_bytes
                                     tx_wlan = wlan_tx_bytes
+
+                                    self.trigger.emit([0, 0, 0, 0, 0], self.btn_enable)
+                                    self.sheet.write(row, 4, 0)
+                                    self.sheet.write(row, 5, 0)
+                                    self.sheet.write(row, 6, 0)
+                                    self.sheet.write(row, 7, 0)
+                                    self.sheet.write(row, 8, 0)
+                                    print("net %d" % row)
                                 else:
                                     wlan_rx_bytes = int(line.split()[5])
                                     wlan_tx_bytes = int(line.split()[7])
@@ -101,7 +110,6 @@ class NetThread(QThread, Common):
 
 
                                         self.trigger.emit(wlan_res, self.btn_enable)
-                                        row += 1
                                         self.sheet.write(row, 4, wlan_recspeed)
                                         self.sheet.write(row, 5, wlan_sendspeed)
                                         self.sheet.write(row, 6, wlan_total_recieve)

@@ -66,7 +66,7 @@ class Common():
     # 检测adb是否连接成功
     def check_adb(self, package):
         app = self.get_package(package)
-        cmd = "adb shell ps | findstr \"" + app + "\""
+        cmd = "adb shell \" ps | grep \"" + app + "\"\""
         res = self.execshell(cmd)
 
         if res.poll() is None:

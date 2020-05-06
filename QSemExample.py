@@ -3,7 +3,7 @@ from time import sleep
 from PyQt5.QtCore import *
 
 DataSize = 30
-BufferSize = 3
+BufferSize = 2
 ps = QSemaphore(BufferSize)
 ds = QSemaphore(0)
 cs = QSemaphore(0)
@@ -12,16 +12,16 @@ class Producer(QThread) :
     def run(self):
         for i in range(DataSize):
             ps.acquire()
-            print('P')
+            print('###P####')
             sleep(1)
-            ds.release()
+            cs.release()
 
 class Consumer(QThread) :
     def run(self):
         for i in range(DataSize):
             cs.acquire()
             print('C')
-            sleep(1)
+            sleep(3)
             ps.release()
 
 class Deliver(QThread) :
@@ -48,8 +48,7 @@ if __name__ == '__main__':
     p.start()
     d.start()
     c.start()
-    # g.start()
     p.wait()
-    d.wait()
     c.wait()
+    # g.start()
     # g.wait()

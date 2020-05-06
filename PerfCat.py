@@ -318,6 +318,7 @@ class MyWindow(QWidget):
         self.package = self.test_package.currentText()
 
         if device == 1:
+            self.get_cpu.setEnabled(False)
             self.show_msg("采集性能数据")
             self.getData = 1
             path = "D:\\PerfReport"
@@ -346,6 +347,8 @@ class MyWindow(QWidget):
             self.battery_thread.trigger.connect(self.stop_get_battery)
             self.drawcall_thread.trigger.connect(self.stop_get_drawcall)
 
+            # self.cpu_thread.start()
+
             QueThread = Queue()
             QueThread.put(self.cpu_thread)
             QueThread.put(self.fps_thread)
@@ -354,7 +357,6 @@ class MyWindow(QWidget):
             QueThread.put(self.tempe_thread)
             QueThread.put(self.net_thread)
             QueThread.put(self.drawcall_thread)
-
 
             while not QueThread.empty():
                 QueThread.get().start()
