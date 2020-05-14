@@ -19,9 +19,10 @@ class DrawcallThread(QThread, Common):
         self.workbook = workbook
         self.btn_enable = False
         self.lock = lock
+        self.com = Common()
 
     def run(self):
-        row = 1
+        row = 0
         avg_sum = 0
 
         durtime = self.durtime.replace("min", "")
@@ -37,7 +38,7 @@ class DrawcallThread(QThread, Common):
             if self.check_adb(self.package) == 1:
 
                 # cmd_fps = "adb shell service call SurfaceFlinger 1013"
-                cmd = "adb shell \"cat /sdcard/jjlog_fps.log\""
+                cmd = self.com.adb + " shell \"cat /sdcard/jjlog_fps.log\""
                 res = self.execshell(cmd)
                 if res.poll() is None:
                     line = res.stdout.readline().decode('utf-8', 'ignore')

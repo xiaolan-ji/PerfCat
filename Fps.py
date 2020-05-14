@@ -19,10 +19,12 @@ class FpsThread(QThread, Common):
         self.btn_enable = False
         self.ratio = 1
         self.lock = lock
+        self.com = Common()
+
 
     def run(self):
 
-        row = 1
+        row = 0
         last_fps = 0
 
         durtime = self.durtime.replace("min", "")
@@ -37,7 +39,7 @@ class FpsThread(QThread, Common):
             start_time = time.time()
             if self.check_adb(self.package) == 1:
                 # cmd_fps = "adb shell service call SurfaceFlinger 1013"
-                cmd_fps = "adb shell \"dumpsys SurfaceFlinger | grep flips\""
+                cmd_fps = self.com.adb + " shell \"dumpsys SurfaceFlinger | grep flips\""
                 res = self.execshell(cmd_fps)
                 if res.poll() is None:
                     line = res.stdout.readline().decode('utf-8', 'ignore')

@@ -19,6 +19,7 @@ from Common import Common
 from Fps import FpsThread
 from Net import NetThread
 from Temperature import TempeThread
+from Draw import Draw
 
 
 class MyWindow(QWidget):
@@ -34,7 +35,7 @@ class MyWindow(QWidget):
             u"温度", "Drawcall", u"电量"
         ]
         self.excel_path = "D:\PerfReport"
-        self.create_excel()
+        # self.create_excel()
         self.getData = 0
 
         BufferSize = 1 #同时并发的线程数
@@ -53,10 +54,11 @@ class MyWindow(QWidget):
         self.lock['mem'] = MemS
         self.lock['temp'] = TempS
         self.lock['battery'] = BatteryS
+        self.dw = Draw()
 
     def init_Ui(self):
         self.setWindowTitle('性能测试自动化工具')
-        self.resize(447, 170)
+        self.resize(450, 170)
 
         self.centralwidget = QWidget()
         self.centralwidget.setObjectName("centralwidget")
@@ -83,6 +85,11 @@ class MyWindow(QWidget):
         self.open_dir.setObjectName("open_dir")
         self.open_dir.clicked.connect(self.open_dir_fun)
         self.gridLayout.addWidget(self.open_dir, 0, 2, 1, 1)
+
+        self.drawBtn = QPushButton(self.centralwidget)
+        self.drawBtn.setObjectName("drawBtn")
+        self.drawBtn.clicked.connect(self.draw)
+        self.gridLayout.addWidget(self.drawBtn, 2, 2, 1, 1)
 
         self.label_4 = QLabel(self.centralwidget)
         self.label_4.setObjectName("label_4")
@@ -246,11 +253,18 @@ class MyWindow(QWidget):
         self.label_recieve.setText("下行速度：")
         self.label_tempe.setText("cpu温度：")
         self.label_battery.setText("实时电量：")
+        self.drawBtn.setText("绘制折线图")
 
 
     # 打开存储文件夹
     def open_dir_fun(self):
         QFileDialog.getOpenFileNames(self, "打开...", self.excel_path, "All Files(*)")
+
+    # 读取性能数据excel绘制数据分析图表
+    def draw(self):
+        file, type = QFileDialog.getOpenFileNames(self, "打开...", self.excel_path, "All Files(*)")
+        self.dw.cpu_line_chart(file)
+        self.dw.mem_line_chart(file)
 
     # 使用QMessageBox提示
     def closeEvent(self, QCloseEvent):
@@ -275,9 +289,9 @@ class MyWindow(QWidget):
         if res == 0:
             self.wb = xlwt.Workbook()
             self.writeSheet = self.wb.add_sheet('report', cell_overwrite_ok=True)
-            self.writeSheet.write(0, 0, self.android_version + "__" + self.phone_model + "__" + self.mem_total)
+            self.writeSheet.write(0, 17, self.android_version + "__" + self.phone_model + "__" + self.mem_total)
             for i in range(0, len(self.title)):
-                self.writeSheet.write(1, i, self.title[i])
+                self.writeSheet.write(0, i, self.title[i])
             # self.wb.save(self.excel)
         else:
             self.workbook = xlrd.open_workbook(self.excel)
@@ -318,6 +332,7 @@ class MyWindow(QWidget):
         self.package = self.test_package.currentText()
 
         if device == 1:
+            self.create_excel()
             self.get_cpu.setEnabled(False)
             self.show_msg("采集性能数据")
             self.getData = 1

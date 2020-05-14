@@ -18,9 +18,10 @@ class CpuThread(QThread, Common):
         self.workbook = workbook
         self.btn_enable = False
         self.lock = lock
+        self.com = Common()
 
     def run(self):
-        row = 1
+        row = 0
         count = 0
         durtime = self.durtime.replace("min", "")
         interval = self.interval.replace("s", "")
@@ -33,12 +34,14 @@ class CpuThread(QThread, Common):
 
         name = self.get_package(self.package)
         interval = str(interval)
-        # cmd_cpu = "adb shell top -n " + n + " -d " + interval + " | find \"" + name + "\""
-        cmd_cpu = "adb shell top -n " + n + " -d " + interval + " | find \"" + name + "\""
+        cmd_cpu = self.com.adb + " shell top -n " + n + " -d " + interval + " | find \"" + name + "\""
+        # self.execshell("adb shell")
+        # cmd_cpu = "top -n " + n + " -d " + interval + " | find \"" + name + "\""
+
 
         if self.check_adb(self.package) == 1:
             res = self.execshell(cmd_cpu)
-            cpuInfo_res = self.execshell("adb shell \"cat /proc/cpuinfo\"")
+            cpuInfo_res = self.execshell(self.com.adb + " shell \"cat /proc/cpuinfo\"")
 
             #获取cpu核数
             while cpuInfo_res.poll() is None:

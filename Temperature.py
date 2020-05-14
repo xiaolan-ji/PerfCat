@@ -19,9 +19,10 @@ class TempeThread(QThread, Common):
         self.workbook = workbook
         self.btn_enable = False
         self.lock = lock
+        self.com = Common()
 
     def run(self):
-        row = 1
+        row = 0
         avg_sum = 0
 
         durtime = self.durtime.replace("min", "")
@@ -37,7 +38,7 @@ class TempeThread(QThread, Common):
             if self.check_adb(self.package) == 1:
                 if self.check_adb(self.package) == 1:
                     # cmd_fps = "adb shell service call SurfaceFlinger 1013"
-                    cmd = "adb shell \"cat /sys/class/thermal/thermal_zone7/temp\""
+                    cmd = self.com.adb + " shell \"cat /sys/class/thermal/thermal_zone7/temp\""
                     res = self.execshell(cmd)
                     if res.poll() is None:
                         line = res.stdout.readline().decode('utf-8', 'ignore')
@@ -50,7 +51,7 @@ class TempeThread(QThread, Common):
                             row += 1
                             self.sheet.write(row, 14, line)
                             print("temp %d" % row)
-                            self.lock['net'].release()
+                    self.lock['net'].release()
 
                     while (time.time()-start_time)*1000000 <= interval * 1000000:
                         sleep_interval += 0.0000001

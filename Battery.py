@@ -19,10 +19,11 @@ class BatteryThread(QThread, Common):
         self.workbook = workbook
         self.btn_enable = False
         self.lock = lock
+        self.com = Common()
 
     def run(self):
 
-        row = 1
+        row = 0
         avg_sum = 0
 
         durtime = self.durtime.replace("min", "")
@@ -36,7 +37,7 @@ class BatteryThread(QThread, Common):
             sleep_interval = 0.001
             start_time = time.time()
             if self.check_adb(self.package) == 1:
-                cmd = "adb shell dumpsys battery"
+                cmd = self.com.adb + " shell dumpsys battery"
                 res = self.execshell(cmd)
                 while res.poll() is None:
                     line = res.stdout.readline().decode('utf-8', 'ignore')

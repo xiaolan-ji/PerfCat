@@ -20,6 +20,9 @@ class NetThread(QThread, Common):
         self.workbook = workbook
         self.btn_enable = False
         self.lock = lock
+        self.appData = Common.app_data(self)
+        self.phoneModel = self.appData['phone_model']  #获取手机型号
+        self.com = Common()
 
     def run(self):
         row = 1
@@ -44,10 +47,11 @@ class NetThread(QThread, Common):
         avg_sum = 0
         flag = '1' #读取流量命令标识
 
-        cmd_mem = "adb shell \" dumpsys package " + name + " | grep \"userId\"\""
+        cmd_mem = self.com.adb + " shell \" dumpsys package " + name + " | grep \"userId\"\""
         wlan_res = self.execshell(cmd_mem)
-        userId = str(wlan_res.stdout.readline())
-        userId = re.findall('userId=(\d+)', userId).pop()
+        userId = wlan_res.stdout.readline().decode('utf-8', 'ignore')
+        if userId:
+            userId = re.findall('userId=(\d+)', userId).pop()
 
         for i in range(n):
             start_time = time.time()
@@ -56,7 +60,7 @@ class NetThread(QThread, Common):
                 self.lock['net'].acquire()
                 wlan_res = []
                 rmnet_res = []
-                cmd_mem = "adb shell \"cat /proc/net/xt_qtaguid/stats | grep " + userId
+                cmd_mem = self.com.adb + " shell \"cat /proc/net/xt_qtaguid/stats | grep " + userId
                 res = self.execshell(cmd_mem)
 
                 while res.poll() is None:
@@ -68,10 +72,10 @@ class NetThread(QThread, Common):
                     #     flag = '0'
 
                     if 'No such file or directory' not in line:
-                        if line and int(line.split()[17]) == 18720:
-                        # if len(line) > 0 and '1' in line.split()[4]:
+                        # if line and int(line.split()[5]) > 0:
+                        if len(line) > 0 and flag in line.split()[4]:
                             if 'wlan' in line:
-                                row += 1
+
                                 if rx_wlan == 0 and tx_wlan == 0:
                                     wlan_rx_bytes = int(line.split()[5])
                                     wlan_tx_bytes = int(line.split()[7])
@@ -91,6 +95,7 @@ class NetThread(QThread, Common):
                                     wlan_recieve = (wlan_rx_bytes - rx_wlan) / 1024
                                     wlan_send = (wlan_tx_bytes - tx_wlan) / 1024
                                     if wlan_recieve > 0 and wlan_send > 0:
+
                                         wlan_recspeed = round(wlan_recieve / interval, 4)
                                         wlan_sendspeed = round(wlan_send / interval, 4)
                                         wlan_total_recieve += wlan_recieve / 1024
@@ -110,11 +115,21 @@ class NetThread(QThread, Common):
 
 
                                         self.trigger.emit(wlan_res, self.btn_enable)
+
+                                        row += 1
                                         self.sheet.write(row, 4, wlan_recspeed)
                                         self.sheet.write(row, 5, wlan_sendspeed)
                                         self.sheet.write(row, 6, wlan_total_recieve)
                                         self.sheet.write(row, 7, wlan_total_send)
                                         self.sheet.write(row, 8, wlan_total)
+                                        print("net %d" % row)
+                                    else:
+                                        row += 1
+                                        self.sheet.write(row, 4, 0)
+                                        self.sheet.write(row, 5, 0)
+                                        self.sheet.write(row, 6, 0)
+                                        self.sheet.write(row, 7, 0)
+                                        self.sheet.write(row, 8, 0)
                                         print("net %d" % row)
                                 self.lock['drawcall'].release()
 
@@ -153,7 +168,7 @@ class NetThread(QThread, Common):
                                         self.sheet.write(row, 11, rmnet_total_recieve)
                                         self.sheet.write(row, 12, rmnet_total_send)
                                         self.sheet.write(row, 13, rmnet_total)
-                                        self.lock['cpu'].release()
+                                self.lock['drawcall'].release()
 
 
                 while (time.time() - start_time) * 1000000 <= interval * 1000000:

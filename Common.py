@@ -1,10 +1,13 @@
 import re
 import subprocess
 import os
+
+import pandas as pd
 import xlrd
 import xlwt
 from xlutils.copy import copy
 import copy
+import numpy as np
 
 
 class Common():
@@ -14,11 +17,22 @@ class Common():
         self.title = [u"COUNT", u"CPU(%)", u"MEM(M)"]
         self.data = []
         self.lock = ['cpu']
+        # self.cur_path = os.path.dirname(os.path.realpath(__file__))
+        # self.cur_path = os.getcwd()
+        # self.adb = os.path.join(os.path.dirname(self.cur_path), 'Perfcat\\adb\\adb')
+        # self.adb =
+        self.adb = "adb"
+
 
     # 获得锁标识
     def getLock(self, t):
         print(t + 'get' + str(id(self.lock)))
         return self.lock[0]
+
+    # 读取excel表格
+    def read_excel(self, excel_path):
+        return pd.read_excel(excel_path)
+
 
     # 设置锁标识
     def setLock(self, lock, t):
@@ -66,7 +80,7 @@ class Common():
     # 检测adb是否连接成功
     def check_adb(self, package):
         app = self.get_package(package)
-        cmd = "adb shell \" ps | grep \"" + app + "\"\""
+        cmd = self.adb+" shell \"ps | grep \"" + app + "\"\""
         res = self.execshell(cmd)
 
         if res.poll() is None:
@@ -76,8 +90,8 @@ class Common():
             # notCnjj = re.findall('cn\.jj\.|\:(\w+)', line)
             if 'no devices' in line or 'error' in line:
                 return 0
-            elif len(notCnjj) > 0 and "JJ斗地主" in package:
-                return 2
+            # elif len(notCnjj) > 0 and "JJ斗地主" in package:
+            #     return 2
             elif app in line:
                 return 1
             else:
@@ -189,9 +203,9 @@ class Common():
     # 展示APP信息
     def app_data(self):
         cmd_res = {'android_version':'', 'phone_version':'', 'mem_total':''}
-        cmd_android_version = "adb shell getprop ro.build.version.release"
-        cmd_phone_model = "adb -d shell getprop ro.product.model"
-        cmd_mem_info = "adb shell cat /proc/meminfo "
+        cmd_android_version = self.adb + " shell getprop ro.build.version.release"
+        cmd_phone_model = self.adb + " -d shell getprop ro.product.model"
+        cmd_mem_info = self.adb + " shell cat /proc/meminfo "
         cmd_res['android_version'] = self.get_cmd_res(cmd_android_version).pop()
         cmd_res['phone_model'] = self.get_cmd_res(cmd_phone_model).pop()
         cmd_res['mem_total'] = self.get_cmd_res(cmd_mem_info).pop(0)

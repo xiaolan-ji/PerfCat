@@ -19,9 +19,10 @@ class MemThread(QThread, Common):
         self.workbook = workbook
         self.btn_enable = False
         self.lock = lock
+        self.com = Common()
 
     def run(self):
-        row = 1
+        row = 0
         avg_sum = 0
 
         durtime = self.durtime.replace("min", "")
@@ -36,7 +37,7 @@ class MemThread(QThread, Common):
             sleep_interval = 0.001
             if self.check_adb(self.package) == 1:
                 row += 1
-                cmd_mem = "adb shell dumpsys meminfo " + name
+                cmd_mem = self.com.adb + " shell dumpsys meminfo " + name
                 res = self.execshell(cmd_mem)
 
                 while res.poll() is None:
