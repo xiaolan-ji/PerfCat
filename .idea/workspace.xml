@@ -2,17 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c710b0b4-4e4a-4828-b51e-7595e13c7c2e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Draw.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Battery.py" beforeDir="false" afterPath="$PROJECT_DIR$/Battery.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Common.py" beforeDir="false" afterPath="$PROJECT_DIR$/Common.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cpu.py" beforeDir="false" afterPath="$PROJECT_DIR$/Cpu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Draw.py" beforeDir="false" afterPath="$PROJECT_DIR$/Draw.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Drawcall.py" beforeDir="false" afterPath="$PROJECT_DIR$/Drawcall.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fps.py" beforeDir="false" afterPath="$PROJECT_DIR$/Fps.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mem.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Net.py" beforeDir="false" afterPath="$PROJECT_DIR$/Net.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PerfCat.py" beforeDir="false" afterPath="$PROJECT_DIR$/PerfCat.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PerfCat.spec" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Temperature.py" beforeDir="false" afterPath="$PROJECT_DIR$/Temperature.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -119,7 +121,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="QSemExample" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="Test" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="PerfCat" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -131,7 +133,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/QSemExample.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Test.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -164,10 +166,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.PerfCat" />
+        <item itemvalue="Python.Test" />
         <item itemvalue="Python.Draw" />
         <item itemvalue="Python.test" />
         <item itemvalue="Python.Common" />
-        <item itemvalue="Python.QSemExample" />
       </list>
     </recent_temporary>
   </component>

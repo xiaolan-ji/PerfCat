@@ -1,7 +1,6 @@
 import sys
 import time
 from queue import Queue
-
 import xlrd
 import xlwt
 from PyQt5 import QtWidgets
@@ -10,7 +9,6 @@ from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import *
 from xlutils.copy import copy
 import re
-
 from Battery import BatteryThread
 from Cpu import CpuThread
 from Drawcall import DrawcallThread
@@ -245,8 +243,6 @@ class MyWindow(QWidget):
         self.label_mem.setText("实时内存：")
         self.label_fps.setText("实时FPS：")
 
-        # self.download_label.setText("下载流量：")
-        # self.upload_label.setText("上传流量：")
         self.label_total.setText("总流量 ：")
         self.label_drawcall.setText("Drawcall：")
         self.label_send.setText("上行速度：")
@@ -362,8 +358,6 @@ class MyWindow(QWidget):
             self.battery_thread.trigger.connect(self.stop_get_battery)
             self.drawcall_thread.trigger.connect(self.stop_get_drawcall)
 
-            # self.cpu_thread.start()
-
             QueThread = Queue()
             QueThread.put(self.cpu_thread)
             QueThread.put(self.fps_thread)
@@ -375,7 +369,6 @@ class MyWindow(QWidget):
 
             while not QueThread.empty():
                 QueThread.get().start()
-
 
 
     # 电量采集槽函数

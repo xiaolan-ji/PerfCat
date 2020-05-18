@@ -1,5 +1,6 @@
 import re
 import time
+import traceback
 from time import sleep
 from PyQt5.QtCore import *
 from Common import Common
@@ -22,50 +23,49 @@ class DrawcallThread(QThread, Common):
         self.com = Common()
 
     def run(self):
-        row = 0
-        avg_sum = 0
+        try:
+            row = 0
+            durtime = self.durtime.replace("min", "")
+            interval = self.interval.replace("s", "")
+            durtime = int(durtime)*60
+            interval = int(interval)
+            n = int(durtime / interval)
 
-        durtime = self.durtime.replace("min", "")
-        interval = self.interval.replace("s", "")
-        durtime = int(durtime)*60
-        interval = int(interval)
-        n = int(durtime / interval)
+            for i in range(n):
+                sleep_interval = 0.001
+                start_time = time.time()
+                if self.check_adb(self.package) == 1:
 
+                    # cmd_fps = "adb shell service call SurfaceFlinger 1013"
+                    cmd = self.com.adb + " shell \"cat /sdcard/jjlog_fps.log\""
+                    res = self.execshell(cmd)
+                    if res.poll() is None:
+                        line = res.stdout.readline().decode('utf-8', 'ignore')
+                        # line = str(res.stdout.readline())
+                        if 'No such file or directory' in line:
+                            if self.lock['drawcall'].tryAcquire():
+                                self.lock['cpu'].release()
+                        else:
+                            line = re.findall('Draw\scall\s\:\s(\d+)', line)
+                            if line:
+                                line = line.pop()
+                                line = int(line)
 
-        for i in range(n):
-            sleep_interval = 0.001
-            start_time = time.time()
-            if self.check_adb(self.package) == 1:
+                                self.lock['drawcall'].acquire()
+                                self.trigger.emit(line, self.btn_enable)
+                                row += 1
+                                self.sheet.write(row, 15, line)
+                                # print("drawcall %d" % row)
+                                self.lock['cpu'].release()
 
-                # cmd_fps = "adb shell service call SurfaceFlinger 1013"
-                cmd = self.com.adb + " shell \"cat /sdcard/jjlog_fps.log\""
-                res = self.execshell(cmd)
-                if res.poll() is None:
-                    line = res.stdout.readline().decode('utf-8', 'ignore')
-                    # line = str(res.stdout.readline())
-                    if 'No such file or directory' in line:
-                        if self.lock['drawcall'].tryAcquire():
-                            self.lock['cpu'].release()
-                    else:
-                        line = re.findall('Draw\scall\s\:\s(\d+)', line)
-                        if line:
-                            line = line.pop()
-                            line = int(line)
-
-                            self.lock['drawcall'].acquire()
-                            self.trigger.emit(line, self.btn_enable)
-                            row += 1
-                            self.sheet.write(row, 15, line)
-                            print("drawcall %d" % row)
-                            self.lock['cpu'].release()
-
-
-                while (time.time()-start_time)*1000000 <= interval * 1000000:
-                    sleep_interval += 0.0000001
-                    sleep(sleep_interval)
-                end_time = time.time()
-                avg = (end_time-start_time)*1000
-                # print("Drawcall为%f" % avg)
-        self.btn_enable = True
-        self.trigger.emit(0, self.btn_enable)
-        self.workbook.save(self.excel)
+                    while (time.time()-start_time)*1000000 <= interval * 1000000:
+                        sleep_interval += 0.0000001
+                        sleep(sleep_interval)
+                    end_time = time.time()
+                    # avg = (end_time-start_time)*1000
+                    # print("Drawcall为%f" % avg)
+            self.btn_enable = True
+            self.trigger.emit(0, self.btn_enable)
+            self.workbook.save(self.excel)
+        except Exception:
+            self.com.writeLog().info(traceback.format_exc())

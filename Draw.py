@@ -1,5 +1,5 @@
+import traceback
 import pandas as pd
-from matplotlib import pyplot as plt
 from Common import Common
 from pylab import *
 mpl.rcParams['font.sans-serif'] = ['SimHei']
@@ -8,6 +8,7 @@ mpl.rcParams['font.sans-serif'] = ['SimHei']
 class Draw(Common):
     def __init__(self):
         super(Draw, self).__init__()
+        self.com = Common()
 
     # 绘制cpu折线图
     def cpu_line_chart(self, excel):
@@ -22,12 +23,15 @@ class Draw(Common):
             else:
                 lineLabel.append("性能数据")
         for data in excelList:
-            x = range(len(data))
-            y = data['CPU(%)']
-
-            # plt.plot(x[::10], y[::10], label=lineLabel[i])
-            plt.plot(x, y, label=lineLabel[i])
-            i += 1
+            try:
+                x = range(len(data))
+                y = data['CPU(%)']
+            except Exception:
+                self.com.writeLog().info(traceback.format_exc())
+            else:
+                # plt.plot(x[::10], y[::10], label=lineLabel[i])
+                plt.plot(x, y, label=lineLabel[i])
+                i += 1
 
         ylabel = "CPU(%)"
         chart_title = "CPU趋势"
@@ -53,12 +57,15 @@ class Draw(Common):
             else:
                 lineLabel.append("性能数据")
         for data in excelList:
-            x = range(len(data))
-            y = data['MEM(M)']
-
-            # plt.plot(x[::10], y[::10], label=lineLabel[i])
-            plt.plot(x, y, label=lineLabel[i])
-            i += 1
+            try:
+                x = range(len(data))
+                y = data['MEM(M)']
+            except Exception:
+                self.com.writeLog().info(traceback.format_exc())
+            else:
+                # plt.plot(x[::10], y[::10], label=lineLabel[i])
+                plt.plot(x, y, label=lineLabel[i])
+                i += 1
 
         ylabel = "PSS(Mb)"
         chart_title = "PSS趋势"

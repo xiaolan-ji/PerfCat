@@ -1,13 +1,14 @@
+import logging
 import re
 import subprocess
 import os
+import traceback
 
 import pandas as pd
 import xlrd
 import xlwt
 from xlutils.copy import copy
 import copy
-import numpy as np
 
 
 class Common():
@@ -17,27 +18,26 @@ class Common():
         self.title = [u"COUNT", u"CPU(%)", u"MEM(M)"]
         self.data = []
         self.lock = ['cpu']
-        # self.cur_path = os.path.dirname(os.path.realpath(__file__))
-        # self.cur_path = os.getcwd()
-        # self.adb = os.path.join(os.path.dirname(self.cur_path), 'Perfcat\\adb\\adb')
-        # self.adb =
-        self.adb = "adb"
+        self.adb = "adb" #adb执行程序的路径
 
+    # 捕捉异常并写入到日志
+    def writeLog(self):
+        logger = logging.getLogger(__name__)
+        logger.setLevel(level=logging.INFO)
+        handler = logging.FileHandler("D:\Perfcat_Log.txt")
+        handler.setLevel(logging.INFO)
+        formatter = logging.Formatter('######%(asctime)s###### - %(name)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        return logger
 
     # 获得锁标识
     def getLock(self, t):
-        print(t + 'get' + str(id(self.lock)))
         return self.lock[0]
 
     # 读取excel表格
     def read_excel(self, excel_path):
         return pd.read_excel(excel_path)
-
-
-    # 设置锁标识
-    def setLock(self, lock, t):
-        self.lock[:] = lock[:]
-        print(t + 'set' + str(id(self.lock)))
 
     # 将传入的字符串按照指定规定的正则匹配提取字符串
     def format_by_re(self, pattern, line):
@@ -79,23 +79,27 @@ class Common():
 
     # 检测adb是否连接成功
     def check_adb(self, package):
-        app = self.get_package(package)
-        cmd = self.adb+" shell \"ps | grep \"" + app + "\"\""
-        res = self.execshell(cmd)
+        try:
+            status = 0
+            app = self.get_package(package)
+            cmd = self.adb+" shell \"ps | grep \"" + app + "\"\""
+            res = self.execshell(cmd)
 
-        if res.poll() is None:
-            line = res.stdout.readline()
-            line = line.decode('utf-8', 'ignore')
-            notCnjj = re.findall('cn\.jj\.(\w+)', line)
-            # notCnjj = re.findall('cn\.jj\.|\:(\w+)', line)
-            if 'no devices' in line or 'error' in line:
-                return 0
-            # elif len(notCnjj) > 0 and "JJ斗地主" in package:
-            #     return 2
-            elif app in line:
-                return 1
-            else:
-                return 2
+            while res.poll() is None:
+                line = res.stdout.readline().decode('utf-8', 'ignore')
+                line = re.findall('cn\.(\S+)', line)
+                if line:
+                    line = "cn." + line.pop()
+                if 'no devices' in line or 'error' in line:
+                    status = 0
+                elif app == line:
+                    status = 1
+                    return status
+                else:
+                    status = 2
+            return status
+        except Exception:
+            self.com.writeLog().info(traceback.format_exc())
 
     # #返回检测设备文字提示
     # def check_adb_text(self):
@@ -143,17 +147,20 @@ class Common():
 
     # 向指定excel表格指定列中追加数据,传入参数为字符串
     def write_excel_bystr(self, row, col, excel, line):
-        res = self.check_excel(excel)
-        if res == 0:
-            self.create_excel(excel)
-        else:
-            self.workbook = self.create_excel(excel)
-            self.workbook = xlrd.open_workbook(excel)
-            wb = copy(self.workbook)
-            writeSheet = wb.get_sheet(0)
-            writeSheet.write(row, 0, row)
-            writeSheet.write(row, col, line)
-            wb.save(excel)
+        try:
+            res = self.check_excel(excel)
+            if res == 0:
+                self.create_excel(excel)
+            else:
+                self.workbook = self.create_excel(excel)
+                self.workbook = xlrd.open_workbook(excel)
+                wb = copy(self.workbook)
+                writeSheet = wb.get_sheet(0)
+                writeSheet.write(row, 0, row)
+                writeSheet.write(row, col, line)
+                wb.save(excel)
+        except Exception:
+            self.com.writeLog().info(traceback.format_exc())
 
 
     # 对传入的excel表进行校验，验证是否存在
@@ -210,12 +217,3 @@ class Common():
         cmd_res['phone_model'] = self.get_cmd_res(cmd_phone_model).pop()
         cmd_res['mem_total'] = self.get_cmd_res(cmd_mem_info).pop(0)
         return cmd_res
-
-
-
-
-
-if __name__ == "__main__":
-    cm = Common()
-    package = "JJ斗地主"
-    cm.app_data()
