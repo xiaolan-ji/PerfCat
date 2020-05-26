@@ -1,31 +1,33 @@
-class Solution:
-    def __init__(self):
-        self.res = 0
-        self.val = []
-    def sumNums(self, n: int) -> int:
-        # print(n)
-        # if n == 1:
-        #     return 1
-        # print(n)
-        # print("###")
-        #
-        # t = self.sumNums(n - 1)
-        # print("++++")
-        # print(t)
-        # print("n=%d" %(n))
-        # n += t
-        # print(n)
-        # print("___")
-        # return n
-        if n == 1:
-            return 1
-        self.res += self.sumNums(n-1)
-        print(self.res)
-        return self.res
+m = [
+  [1,   4,  7, 11, 15],
+  [2,   5,  8, 12, 19],
+  [3,   6,  9, 16, 22],
+  [10, 13, 14, 17, 24],
+  [18, 21, 23, 26, 30]
+]
 
-if __name__ == "__main__":
-    s = "cn.jj"
-    s2 = "cn.jj.service"
-    s3 = "cn.jj"
-    print(id(s))
-    print(id(s3))
+
+def findNumberIn2DArray(matrix, target):
+    i = int(len(matrix) / 2)
+    j = int(len(matrix[0]) / 2)
+    width = int(len(matrix) / 2)
+
+    while matrix[i][j] > target:
+        while i >= 0:
+            while j >= 0:
+                if matrix[i][j] == target:
+                    return matrix[i][j]
+                j -= 1
+            j = width
+            i -= 1
+
+    while matrix[i][j] < target:
+        i += i / 2
+        j += j / 2
+        i = int(i)
+        j = int(j)
+        if matrix[i][j] >= target:
+            return matrix[i][j]
+    return matrix[i][j]
+m = findNumberIn2DArray(m,11)
+print(m)

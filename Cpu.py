@@ -36,14 +36,21 @@ class CpuThread(QThread, Common):
 
             name = self.get_package(self.package)
             interval = str(interval)
+            # cmd_cpu = self.com.adb + " shell \"top -n " + n + " -d " + interval + " | grep \"" + name + "\"\""
             cmd_cpu = self.com.adb + " shell top -n " + n + " -d " + interval + " | find \"" + name + "\""
             # self.execshell("adb shell")
             # cmd_cpu = "top -n " + n + " -d " + interval + " | find \"" + name + "\""
 
             if self.check_adb(self.package) == 1:
-                res = self.execshell(cmd_cpu)
-                cpuInfo_res = self.execshell(self.com.adb + " shell \"cat /proc/cpuinfo\"")
+                phoneInfo = self.com.app_data()
+                phoneModel = phoneInfo['phone_model']
 
+                # 兼容三星A9机型
+                if 'OPPO-R9' in phoneModel:
+                    # cmd_cpu = self.com.adb + " shell top -n " + n + " -d " + interval + " | find \"" + name + "\""
+                    cmd_cpu = self.com.adb + " shell \"top -n " + n + " -d " + interval + " | grep \"" + name + "\"\""
+
+                cpuInfo_res = self.execshell(self.com.adb + " shell \"cat /proc/cpuinfo\"")
                 #获取cpu核数
                 while cpuInfo_res.poll() is None:
                     cpuInfo = cpuInfo_res.stdout.readline().decode('utf-8', 'ignore')
@@ -52,6 +59,7 @@ class CpuThread(QThread, Common):
                     elif "CPU architecture" in cpuInfo:
                         cpuCore = int(re.findall("CPU architecture:\s(\d)", cpuInfo).pop())
 
+                res = self.execshell(cmd_cpu)
                 while res.poll() is None:
                     start_time = time.time()
                     sleep_interval = 0.001
@@ -82,7 +90,8 @@ class CpuThread(QThread, Common):
                             self.sheet.write(row, 0, count)
                             self.sheet.write(row, 1, float(cpu))
                             # print("#####cpu %d#####" %row)
-                            self.lock['fps'].release()
+                            self.lock['battery'].release()
+                            print("battery release %d" % (self.lock['battery'].available()))
 
                             while (time.time() - start_time) * 1000000 <= interval_time * 1000000:
                                 sleep_interval += 0.0000001

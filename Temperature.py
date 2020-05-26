@@ -50,6 +50,7 @@ class TempeThread(QThread, Common):
                                 self.sheet.write(row, 14, line)
                                 # print("temp %d" % row)
                         self.lock['net'].release()
+                        print("net release %d" % (self.lock['net'].available()))
 
                         while (time.time()-start_time)*1000000 <= interval * 1000000:
                             sleep_interval += 0.0000001

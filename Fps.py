@@ -34,8 +34,10 @@ class FpsThread(QThread, Common):
             n = int(durtime / interval) + 1
 
             for i in range(n):
+                print("fps %d" %(i))
                 sleep_interval = 0.001
                 start_time = time.time()
+                # self.lock['fps'].release()
                 if self.check_adb(self.package) == 1:
                     # cmd_fps = "adb shell service call SurfaceFlinger 1013"
                     cmd_fps = self.com.adb + " shell \"dumpsys SurfaceFlinger | grep flips\""
@@ -51,6 +53,9 @@ class FpsThread(QThread, Common):
                                 if last_fps == 0:
                                     # fps = fps * self.ratio
                                     last_fps = fps
+                                    self.lock['fps'].acquire()
+                                    self.lock['cpu'].release()
+                                    print("______cpu release %d______" % (self.lock['cpu'].available()))
                                 else:
                                     fps = fps * self.ratio
                                     new_fps = fps - last_fps
@@ -63,7 +68,8 @@ class FpsThread(QThread, Common):
                                     row += 1
                                     self.sheet.write(row, 3, new_fps)
                                     # print("fps %d" % row)
-                                    self.lock['battery'].release()
+                                    self.lock['cpu'].release()
+                                    print("######cpu release %d######" % (self.lock['cpu'].available()))
 
                     while (time.time()-start_time)*1000000 <= interval * 1000000:
                         sleep_interval += 0.0000001
@@ -74,7 +80,7 @@ class FpsThread(QThread, Common):
 
             self.btn_enable = True
             self.trigger.emit(0, self.btn_enable)
-            # self.workbook.save(self.excel)
+            self.workbook.save(self.excel)
         except Exception:
             self.com.writeLog().info(traceback.format_exc())
 

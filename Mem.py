@@ -56,6 +56,7 @@ class MemThread(QThread, Common):
                                     self.sheet.write(row, 2, mem)
                                     # print("mem %d" %row)
                                     self.lock['temp'].release()
+                                    print("temp release %d" % (self.lock['temp'].available()))
 
                     while (time.time() - start_time) * 1000000 <= interval * 1000000:
                         sleep_interval += 0.0000001

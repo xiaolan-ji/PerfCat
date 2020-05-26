@@ -129,6 +129,7 @@ class NetThread(QThread, Common):
                                             self.sheet.write(row, 8, 0)
                                             # print("net %d" % row)
                                     self.lock['drawcall'].release()
+                                    print("drawcall release %d" % (self.lock['drawcall'].available()))
 
                                 if 'rmnet' in line:
                                     if rx_rmnet == 0 and tx_rmnet == 0:

@@ -1,5 +1,6 @@
 import sys
 import time
+import traceback
 from queue import Queue
 import xlrd
 import xlwt
@@ -37,8 +38,8 @@ class MyWindow(QWidget):
         self.getData = 0
 
         BufferSize = 1 #同时并发的线程数
-        CpuS = QSemaphore(BufferSize)  # cpu并发锁
-        FpsS = QSemaphore(0)
+        FpsS = QSemaphore(BufferSize)  # cpu并发锁
+        CpuS = QSemaphore(0)
         DrawcallS = QSemaphore(0)
         NetS = QSemaphore(0)
         MemS = QSemaphore(0)
@@ -234,10 +235,10 @@ class MyWindow(QWidget):
         self.interval_time.setItemText(2, "5s")
         self.interval_time.setItemText(3, "10s")
         self.label_3.setText("数据采集时长：")
-        self.during_time.setItemText(0, "1min")
-        self.during_time.setItemText(1, "3min")
-        self.during_time.setItemText(2, "10min")
-        self.during_time.setItemText(3, "20min")
+        self.during_time.setItemText(0, "20min")
+        self.during_time.setItemText(1, "30min")
+        self.during_time.setItemText(2, "60min")
+        self.during_time.setItemText(3, "90min")
         self.get_cpu.setText("开始采集数据")
         self.label_cpu.setText("实时CPU ：")
         self.label_mem.setText("实时内存：")
@@ -258,19 +259,27 @@ class MyWindow(QWidget):
 
     # 读取性能数据excel绘制数据分析图表
     def draw(self):
-        file, type = QFileDialog.getOpenFileNames(self, "打开...", self.excel_path, "All Files(*)")
-        self.dw.cpu_line_chart(file)
-        self.dw.mem_line_chart(file)
+        try:
+            file, type = QFileDialog.getOpenFileNames(self, "打开...", self.excel_path, "All Files(*)")
+            self.dw.cpu_line_chart(file)
+            self.dw.mem_line_chart(file)
+            self.dw.fps_line_chart(file)
+            self.dw.drawcall_line_chart(file)
+        except Exception:
+            self.com.writeLog().info(traceback.format_exc())
 
     # 使用QMessageBox提示
     def closeEvent(self, QCloseEvent):
-        reply = QMessageBox.warning(self, "提示", "确认退出并保存数据到默认目录？", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if (reply == QMessageBox.Yes):
-            if self.getData:
-                self.wb.save(self.excel)
-            QCloseEvent.accept()
-        if (reply == QMessageBox.No):
-            QCloseEvent.ignore()
+        try:
+            reply = QMessageBox.warning(self, "提示", "确认退出并保存数据到默认目录？", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if (reply == QMessageBox.Yes):
+                if self.getData:
+                    self.wb.save(self.excel)
+                QCloseEvent.accept()
+            if (reply == QMessageBox.No):
+                QCloseEvent.ignore()
+        except Exception:
+            self.com.writeLog().info(traceback.format_exc())
 
     # 创建excel表格，如已存在，默认插入该表格中，如无创建
     def create_excel(self):
@@ -369,6 +378,7 @@ class MyWindow(QWidget):
 
             while not QueThread.empty():
                 QueThread.get().start()
+            # self.fps_thread.terminate()
 
 
     # 电量采集槽函数
