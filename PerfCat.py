@@ -19,6 +19,7 @@ from Fps import FpsThread
 from Net import NetThread
 from Temperature import TempeThread
 from Draw import Draw
+from Time import TimeThread
 
 
 class MyWindow(QWidget):
@@ -45,6 +46,7 @@ class MyWindow(QWidget):
         MemS = QSemaphore(0)
         TempS = QSemaphore(0)
         BatteryS = QSemaphore(0)
+        TimeS = QSemaphore(0)
         self.lock = {} #并发锁词典
         self.lock['cpu'] = CpuS
         self.lock['fps'] = FpsS
@@ -53,7 +55,9 @@ class MyWindow(QWidget):
         self.lock['mem'] = MemS
         self.lock['temp'] = TempS
         self.lock['battery'] = BatteryS
+        self.lock['time'] = TimeS
         self.dw = Draw()
+        self.isCollect = 0
 
     def init_Ui(self):
         self.setWindowTitle('性能测试自动化工具')
@@ -126,7 +130,13 @@ class MyWindow(QWidget):
         self.during_time.addItem("")
         self.during_time.addItem("")
         self.during_time.addItem("")
+
+        self.timer = QtWidgets.QLabel(self.centralwidget)
+        self.timer.setText("")
+        self.timer.setObjectName("timer")
+
         self.gridLayout.addWidget(self.during_time, 3, 1, 1, 1)
+        self.gridLayout.addWidget(self.timer, 3, 2, 1, 1)
         self.gridLayout_2.addLayout(self.gridLayout, 0, 0, 1, 1)
 
         self.horizontalLayout = QHBoxLayout()
@@ -135,6 +145,12 @@ class MyWindow(QWidget):
         self.get_cpu.setObjectName("get_cpu")
         self.horizontalLayout.addWidget(self.get_cpu)
         self.get_cpu.clicked.connect(self.get_cpu_fun)
+
+        self.stop_collect = QPushButton(self.centralwidget)
+        self.stop_collect.setObjectName("stop_collect")
+        self.horizontalLayout.addWidget(self.stop_collect)
+        self.stop_collect.clicked.connect(self.stop_collect_fun)
+
         self.gridLayout_2.addLayout(self.horizontalLayout, 1, 0, 1, 1)
 
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
@@ -235,11 +251,12 @@ class MyWindow(QWidget):
         self.interval_time.setItemText(2, "5s")
         self.interval_time.setItemText(3, "10s")
         self.label_3.setText("数据采集时长：")
-        self.during_time.setItemText(0, "20min")
-        self.during_time.setItemText(1, "30min")
-        self.during_time.setItemText(2, "60min")
-        self.during_time.setItemText(3, "90min")
+        self.during_time.setItemText(0, "2min")
+        self.during_time.setItemText(1, "3min")
+        self.during_time.setItemText(2, "6min")
+        self.during_time.setItemText(3, "20min")
         self.get_cpu.setText("开始采集数据")
+        self.stop_collect.setText("停止采集数据")
         self.label_cpu.setText("实时CPU ：")
         self.label_mem.setText("实时内存：")
         self.label_fps.setText("实时FPS：")
@@ -256,6 +273,36 @@ class MyWindow(QWidget):
     # 打开存储文件夹
     def open_dir_fun(self):
         QFileDialog.getOpenFileNames(self, "打开...", self.excel_path, "All Files(*)")
+
+    # 停止采集数据
+    def stop_collect_fun(self):
+        try:
+            if self.isCollect:
+                self.cpu_thread.terminate()
+                self.fps_thread.terminate()
+                self.drawcall_thread.terminate()
+                self.mem_thread.terminate()
+                self.tempe_thread.terminate()
+                self.net_thread.terminate()
+                self.battery_thread.terminate()
+                self.time_thread.terminate()
+
+                self.cpu_data.setText("")
+                self.mem_data.setText("")
+                self.fps.setText("")
+                self.send.setText("")
+                self.recieve.setText("")
+                self.total.setText("")
+                self.tempe.setText("")
+                self.drawcall.setText("")
+                self.battery.setText("")
+                self.timer.setText("")
+
+                self.get_cpu.setEnabled(True)
+                self.stop_collect.setEnabled(False)
+        except Exception:
+            self.com.writeLog().info(traceback.format_exc())
+
 
     # 读取性能数据excel绘制数据分析图表
     def draw(self):
@@ -358,6 +405,8 @@ class MyWindow(QWidget):
                                         , self.lock)
             self.drawcall_thread = DrawcallThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime, self.package
                                         , self.lock)
+            self.time_thread = TimeThread(self.excel, self.writeSheet, self.wb, self.interval, self.durtime,
+                                                  self.package, self.lock)
 
             self.mem_thread.trigger.connect(self.stop_get_mem)
             self.cpu_thread.trigger.connect(self.stop_get_cpu)
@@ -366,6 +415,7 @@ class MyWindow(QWidget):
             self.tempe_thread.trigger.connect(self.stop_get_tempe)
             self.battery_thread.trigger.connect(self.stop_get_battery)
             self.drawcall_thread.trigger.connect(self.stop_get_drawcall)
+            self.time_thread.trigger.connect(self.stop_get_time)
 
             QueThread = Queue()
             QueThread.put(self.cpu_thread)
@@ -375,10 +425,12 @@ class MyWindow(QWidget):
             QueThread.put(self.tempe_thread)
             QueThread.put(self.net_thread)
             QueThread.put(self.drawcall_thread)
+            QueThread.put(self.time_thread)
 
             while not QueThread.empty():
                 QueThread.get().start()
-            # self.fps_thread.terminate()
+            self.isCollect = 1
+            self.stop_collect.setEnabled(True)
 
 
     # 电量采集槽函数
@@ -423,6 +475,9 @@ class MyWindow(QWidget):
         self.recieve.setText(str(list[0]) + 'Kb/s')
         self.send.setText(str(list[1]) + 'Kb/s')
         self.total.setText(str(list[4]) + 'Mb')
+
+    def stop_get_time(self, str):
+        self.timer.setText(str)
 
     # 展示消息弹窗
     def show_msg(self, text):

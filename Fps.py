@@ -44,6 +44,7 @@ class FpsThread(QThread, Common):
                     res = self.execshell(cmd_fps)
                     if res.poll() is None:
                         line = res.stdout.readline().decode('utf-8', 'ignore')
+
                         if line != "":
                             # fps = self.format_by_re('Result: Parcel\((\w+)', line)
                             fps = self.format_by_re('flips=(\d+)', line)
@@ -54,6 +55,8 @@ class FpsThread(QThread, Common):
                                     # fps = fps * self.ratio
                                     last_fps = fps
                                     self.lock['fps'].acquire()
+                                    row += 1
+                                    self.sheet.write(row, 3, 'NULL')
                                     self.lock['cpu'].release()
                                     print("______cpu release %d______" % (self.lock['cpu'].available()))
                                 else:
@@ -67,7 +70,6 @@ class FpsThread(QThread, Common):
                                     last_fps = fps
                                     row += 1
                                     self.sheet.write(row, 3, new_fps)
-                                    # print("fps %d" % row)
                                     self.lock['cpu'].release()
                                     print("######cpu release %d######" % (self.lock['cpu'].available()))
 

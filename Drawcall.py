@@ -45,7 +45,11 @@ class DrawcallThread(QThread, Common):
                         if 'No such file or directory' in line:
                             self.lock['drawcall'].acquire()
                             self.trigger.emit(0, self.btn_enable)
-                            self.lock['fps'].release()
+                            row += 1
+                            self.sheet.write(row, 15, "NULL")
+                            self.workbook.save(self.excel)
+                            self.lock['time'].release()
+                            print("time release %d" % (self.lock['time'].available()))
                         else:
                             line = re.findall('Draw\scall\s\:\s(\d+)', line)
                             if line:
@@ -55,9 +59,9 @@ class DrawcallThread(QThread, Common):
                                 self.trigger.emit(line, self.btn_enable)
                                 row += 1
                                 self.sheet.write(row, 15, line)
-                                # print("drawcall %d" % row)
-                                self.lock['fps'].release()
-                                print("fps release %d" % (self.lock['fps'].available()))
+                                self.workbook.save(self.excel)
+                                self.lock['time'].release()
+                                print("time release %d" % (self.lock['time'].available()))
 
                     while (time.time()-start_time)*1000000 <= interval * 1000000:
                         sleep_interval += 0.0000001
