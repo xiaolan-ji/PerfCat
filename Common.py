@@ -87,14 +87,15 @@ class Common():
 
             while res.poll() is None:
                 line = res.stdout.readline().decode('utf-8', 'ignore')
-                line = re.findall('cn\.(\S+)', line)
-                if line:
-                    line = "cn." + line.pop()
                 if 'no devices' in line or 'error' in line:
                     status = 0
-                elif app == line:
-                    status = 1
                     return status
+                isRun = re.findall('cn\.(\S+)', line)
+                if isRun:
+                    isRun = "cn." + isRun.pop()
+                    if app == isRun:
+                        status = 1
+                        return status
                 else:
                     status = 2
             return status
@@ -190,10 +191,10 @@ class Common():
         isExists = os.path.exists(path)
         if not isExists:
             os.makedirs(path)
-            print(path + ' 创建成功')
+            # print(path + ' 创建成功')
             return True
         else:
-            print(path + ' 目录已存在')
+            # print(path + ' 目录已存在')
             return False
 
     # 获取命令行执行结果

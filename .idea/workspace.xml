@@ -2,26 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c710b0b4-4e4a-4828-b51e-7595e13c7c2e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Time.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Battery.py" beforeDir="false" afterPath="$PROJECT_DIR$/Battery.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Common.py" beforeDir="false" afterPath="$PROJECT_DIR$/Common.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cpu.py" beforeDir="false" afterPath="$PROJECT_DIR$/Cpu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Draw.py" beforeDir="false" afterPath="$PROJECT_DIR$/Draw.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Drawcall.py" beforeDir="false" afterPath="$PROJECT_DIR$/Drawcall.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Fps.py" beforeDir="false" afterPath="$PROJECT_DIR$/Fps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mem.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Net.py" beforeDir="false" afterPath="$PROJECT_DIR$/Net.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PerfCat.py" beforeDir="false" afterPath="$PROJECT_DIR$/PerfCat.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PerfCat.spec" beforeDir="false" afterPath="$PROJECT_DIR$/PerfCat.spec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Temperature.py" beforeDir="false" afterPath="$PROJECT_DIR$/Temperature.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Test.py" beforeDir="false" afterPath="$PROJECT_DIR$/Test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/Analysis-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/COLLECT-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/EXE-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/PKG-00.pkg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/PKG-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/PYZ-00.pyz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/PYZ-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/PerfCat.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/PerfCat.exe.manifest" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/Tree-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/Tree-01.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/base_library.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/warn-PerfCat.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/PerfCat/xref-PerfCat.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Time.py" beforeDir="false" afterPath="$PROJECT_DIR$/Time.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -64,7 +58,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.Test">
+  <component name="RunManager" selected="Python.PerfCat">
     <configuration name="Common" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="PerfCat" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -172,8 +166,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.Test" />
         <item itemvalue="Python.PerfCat" />
+        <item itemvalue="Python.Test" />
         <item itemvalue="Python.Draw" />
         <item itemvalue="Python.test" />
         <item itemvalue="Python.Common" />

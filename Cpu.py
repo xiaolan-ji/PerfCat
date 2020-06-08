@@ -91,7 +91,7 @@ class CpuThread(QThread, Common):
                             self.sheet.write(row, 1, float(cpu))
                             # print("#####cpu %d#####" %row)
                             self.lock['battery'].release()
-                            print("battery release %d" % (self.lock['battery'].available()))
+                            # print("battery release %d" % (self.lock['battery'].available()))
 
                             while (time.time() - start_time) * 1000000 <= interval_time * 1000000:
                                 sleep_interval += 0.0000001
@@ -99,6 +99,7 @@ class CpuThread(QThread, Common):
                             # end_time = time.time()
                             # print("#####cpu为%f######" % (end_time * 1000 - start_time * 1000))
 
+                # print("cpu over")
                 self.btn_enable = True
                 self.trigger.emit('0', self.btn_enable)
                 self.workbook.save(self.excel)

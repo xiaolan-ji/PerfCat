@@ -42,7 +42,7 @@ class TimeThread(QThread, Common):
                 self.lock['time'].acquire()
                 self.trigger.emit(timeCount)
                 self.lock['fps'].release()
-                print("fps release %d" % (self.lock['fps'].available()))
+                # print("fps release %d" % (self.lock['fps'].available()))
 
                 while (time.time() - start_time) * 1000000 <= interval * 1000000:
                     sleep_interval += 0.0000001
@@ -51,6 +51,7 @@ class TimeThread(QThread, Common):
                 # avg = (end_time - start_time) * 1000
                 # print("内存为%f" % avg)
 
+            # print("time over")
             self.trigger.emit("0")
             # self.workbook.save(self.excel)
         except Exception:

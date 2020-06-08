@@ -31,10 +31,10 @@ class FpsThread(QThread, Common):
             interval = self.interval.replace("s", "")
             durtime = int(durtime)*60
             interval = int(interval)
-            n = int(durtime / interval) + 1
+            n = int(durtime / interval)+2
 
             for i in range(n):
-                print("fps %d" %(i))
+                # print("fps %d" %(i))
                 sleep_interval = 0.001
                 start_time = time.time()
                 # self.lock['fps'].release()
@@ -58,7 +58,7 @@ class FpsThread(QThread, Common):
                                     row += 1
                                     self.sheet.write(row, 3, 'NULL')
                                     self.lock['cpu'].release()
-                                    print("______cpu release %d______" % (self.lock['cpu'].available()))
+                                    # print("______cpu release %d______" % (self.lock['cpu'].available()))
                                 else:
                                     fps = fps * self.ratio
                                     new_fps = fps - last_fps
@@ -71,7 +71,7 @@ class FpsThread(QThread, Common):
                                     row += 1
                                     self.sheet.write(row, 3, new_fps)
                                     self.lock['cpu'].release()
-                                    print("######cpu release %d######" % (self.lock['cpu'].available()))
+                                    # print("######cpu release %d######" % (self.lock['cpu'].available()))
 
                     while (time.time()-start_time)*1000000 <= interval * 1000000:
                         sleep_interval += 0.0000001
@@ -79,7 +79,7 @@ class FpsThread(QThread, Common):
                     end_time = time.time()
                     # avg = (end_time-start_time)*1000
                     # print("Fps为%f" % avg)
-
+            # print("fps over")
             self.btn_enable = True
             self.trigger.emit(0, self.btn_enable)
             self.workbook.save(self.excel)

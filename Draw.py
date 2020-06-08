@@ -12,139 +12,143 @@ class Draw(Common):
 
     # 绘制cpu折线图
     def cpu_line_chart(self, excel):
-        i = 0
-        excelList = []
-        lineLabel = []
-        for e in excel:
-            excelList.append(pd.read_excel(e))
-            s = re.findall("\S+/(\w+)_Report", e)
-            if s:
-                lineLabel.append(s.pop())
-            else:
-                lineLabel.append("性能数据")
-        for data in excelList:
-            try:
-                x = range(len(data))
-                y = data['CPU(%)']
-            except Exception:
-                self.com.writeLog().info(traceback.format_exc())
-            else:
-                # plt.plot(x[::10], y[::10], label=lineLabel[i])
-                plt.plot(x, y, label=lineLabel[i])
-                i += 1
+        if excel:
+            i = 0
+            excelList = []
+            lineLabel = []
+            for e in excel:
+                excelList.append(pd.read_excel(e))
+                s = re.findall("\S+/(\w+)_Report", e)
+                if s:
+                    lineLabel.append(s.pop())
+                else:
+                    lineLabel.append("性能数据")
+            for data in excelList:
+                try:
+                    x = range(len(data))
+                    y = data['CPU(%)']
+                except Exception:
+                    self.com.writeLog().info(traceback.format_exc())
+                else:
+                    # plt.plot(x[::10], y[::10], label=lineLabel[i])
+                    plt.plot(x, y, label=lineLabel[i])
+                    i += 1
 
-        ylabel = "CPU(%)"
-        chart_title = "CPU趋势"
-        plt.legend()  # 让图例生效
-        plt.ylabel(ylabel)  # Y轴标签
-        plt.title(chart_title)  # 标题
+            ylabel = "CPU(%)"
+            chart_title = "CPU趋势"
+            plt.legend()  # 让图例生效
+            plt.ylabel(ylabel)  # Y轴标签
+            plt.title(chart_title)  # 标题
 
-        plt.grid(axis="y")
-        plt.xticks(rotation=30)
-        plt.show()
-        plt.close()
+            plt.grid(axis="y")
+            plt.xticks(rotation=30)
+            plt.show()
+            plt.close()
 
     # 绘制内存折线图
     def mem_line_chart(self, excel):
-        i = 0
-        excelList = []
-        lineLabel = []
-        for e in excel:
-            excelList.append(pd.read_excel(e))
-            s = re.findall("\S+/(\w+)_Report", e)
-            if s:
-                lineLabel.append(s.pop())
-            else:
-                lineLabel.append("性能数据")
-        for data in excelList:
-            try:
-                x = range(len(data))
-                y = data['MEM(M)']
-            except Exception:
-                self.com.writeLog().info(traceback.format_exc())
-            else:
-                # plt.plot(x[::10], y[::10], label=lineLabel[i])
-                plt.plot(x, y, label=lineLabel[i])
-                i += 1
+        if excel:
+            i = 0
+            excelList = []
+            lineLabel = []
+            for e in excel:
+                excelList.append(pd.read_excel(e))
+                s = re.findall("\S+/(\w+)_Report", e)
+                if s:
+                    lineLabel.append(s.pop())
+                else:
+                    lineLabel.append("性能数据")
+            for data in excelList:
+                try:
+                    x = range(len(data))
+                    y = data['MEM(M)']
+                except Exception:
+                    self.com.writeLog().info(traceback.format_exc())
+                else:
+                    # plt.plot(x[::10], y[::10], label=lineLabel[i])
+                    plt.plot(x, y, label=lineLabel[i])
+                    i += 1
 
-        ylabel = "PSS(Mb)"
-        chart_title = "PSS趋势"
-        plt.legend()  # 让图例生效
-        plt.ylabel(ylabel)  # Y轴标签
-        plt.title(chart_title)  # 标题
+            ylabel = "PSS(Mb)"
+            chart_title = "PSS趋势"
+            plt.legend()  # 让图例生效
+            plt.ylabel(ylabel)  # Y轴标签
+            plt.title(chart_title)  # 标题
 
-        plt.grid(axis="y")
-        plt.xticks(rotation=30)
-        plt.show()
-        plt.close()
+            plt.grid(axis="y")
+            plt.xticks(rotation=30)
+            plt.show()
+            plt.close()
 
     # 绘制fps折线图
     def fps_line_chart(self, excel):
-        i = 0
-        excelList = []
-        lineLabel = []
-        for e in excel:
-            excelList.append(pd.read_excel(e))
-            s = re.findall("\S+/(\w+)_Report", e)
-            if s:
-                lineLabel.append(s.pop())
-            else:
-                lineLabel.append("性能数据")
-        for data in excelList:
-            try:
-                x = range(len(data))
-                y = data['FPS']
-            except Exception:
-                self.com.writeLog().info(traceback.format_exc())
-            else:
-                # plt.plot(x[::10], y[::10], label=lineLabel[i])
-                plt.plot(x, y, label=lineLabel[i])
-                i += 1
+        if excel:
+            i = 0
+            excelList = []
+            lineLabel = []
+            for e in excel:
+                excelList.append(pd.read_excel(e))
+                s = re.findall("\S+/(\w+)_Report", e)
+                if s:
+                    lineLabel.append(s.pop())
+                else:
+                    lineLabel.append("性能数据")
+            for data in excelList:
+                try:
+                    x = range(len(data))
+                    y = data['FPS']
+                except Exception:
+                    self.com.writeLog().info(traceback.format_exc())
+                else:
+                    # plt.plot(x[::10], y[::10], label=lineLabel[i])
+                    plt.plot(x, y, label=lineLabel[i])
+                    i += 1
 
-        ylabel = "FPS"
-        chart_title = "FPS趋势"
-        plt.legend()  # 让图例生效
-        plt.ylabel(ylabel)  # Y轴标签
-        plt.title(chart_title)  # 标题
+            ylabel = "FPS"
+            chart_title = "FPS趋势"
+            plt.legend()  # 让图例生效
+            plt.ylabel(ylabel)  # Y轴标签
+            plt.title(chart_title)  # 标题
 
-        plt.grid(axis="y")
-        plt.xticks(rotation=30)
-        plt.show()
-        plt.close()
+            plt.grid(axis="y")
+            plt.xticks(rotation=30)
+            plt.show()
+            plt.close()
 
     # 绘制drawcall折线图
     def drawcall_line_chart(self, excel):
-        i = 0
-        excelList = []
-        lineLabel = []
-        for e in excel:
-            excelList.append(pd.read_excel(e))
-            s = re.findall("\S+/(\w+)_Report", e)
-            if s:
-                lineLabel.append(s.pop())
-            else:
-                lineLabel.append("性能数据")
-        for data in excelList:
-            try:
-                x = range(len(data))
-                y = data['Drawcall']
-            except Exception:
-                self.com.writeLog().info(traceback.format_exc())
-            else:
-                # plt.plot(x[::10], y[::10], label=lineLabel[i])
-                plt.plot(x, y, label=lineLabel[i])
-                i += 1
+        if excel:
+            i = 0
+            excelList = []
+            lineLabel = []
+            for e in excel:
+                excelList.append(pd.read_excel(e))
+                s = re.findall("\S+/(\w+)_Report", e)
+                if s:
+                    lineLabel.append(s.pop())
+                else:
+                    lineLabel.append("性能数据")
+            for data in excelList:
+                try:
+                    x = range(len(data))
+                    y = data['Drawcall']
+                except Exception:
+                    self.com.writeLog().info(traceback.format_exc())
+                else:
+                    # plt.plot(x[::10], y[::10], label=lineLabel[i])
+                    plt.plot(x, y, label=lineLabel[i])
+                    i += 1
 
-        ylabel = "Drawcall"
-        chart_title = "Drawcall趋势"
-        plt.legend()  # 让图例生效
-        plt.ylabel(ylabel)  # Y轴标签
-        plt.title(chart_title)  # 标题
+            ylabel = "Drawcall"
+            chart_title = "Drawcall趋势"
+            plt.legend()  # 让图例生效
+            plt.ylabel(ylabel)  # Y轴标签
+            plt.title(chart_title)  # 标题
 
-        plt.grid(axis="y")
-        plt.xticks(rotation=30)
-        plt.show()
-        plt.close()
+            plt.grid(axis="y")
+            plt.xticks(rotation=30)
+            plt.show()
+            plt.close()
 
 
 

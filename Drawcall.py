@@ -49,7 +49,7 @@ class DrawcallThread(QThread, Common):
                             self.sheet.write(row, 15, "NULL")
                             self.workbook.save(self.excel)
                             self.lock['time'].release()
-                            print("time release %d" % (self.lock['time'].available()))
+                            # print("time release %d" % (self.lock['time'].available()))
                         else:
                             line = re.findall('Draw\scall\s\:\s(\d+)', line)
                             if line:
@@ -61,7 +61,7 @@ class DrawcallThread(QThread, Common):
                                 self.sheet.write(row, 15, line)
                                 self.workbook.save(self.excel)
                                 self.lock['time'].release()
-                                print("time release %d" % (self.lock['time'].available()))
+                                # print("time release %d" % (self.lock['time'].available()))
 
                     while (time.time()-start_time)*1000000 <= interval * 1000000:
                         sleep_interval += 0.0000001
@@ -69,6 +69,7 @@ class DrawcallThread(QThread, Common):
                     end_time = time.time()
                     # avg = (end_time-start_time)*1000
                     # print("Drawcall为%f" % avg)
+            # print("drawcall over")
             self.btn_enable = True
             self.trigger.emit(0, self.btn_enable)
             self.workbook.save(self.excel)

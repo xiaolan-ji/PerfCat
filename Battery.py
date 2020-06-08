@@ -25,7 +25,6 @@ class BatteryThread(QThread, Common):
     def run(self):
         try:
             row = 0
-            avg_sum = 0
             durtime = self.durtime.replace("min", "")
             interval = self.interval.replace("s", "")
             durtime = int(durtime)*60
@@ -49,9 +48,8 @@ class BatteryThread(QThread, Common):
                                 self.trigger.emit(line, self.btn_enable)
                                 row += 1
                                 self.sheet.write(row, 16, line)
-                                # print('battery %d' %row)
                                 self.lock['mem'].release()
-                                print("mem release %d" % (self.lock['mem'].available()))
+                                # print("mem release %d" % (self.lock['mem'].available()))
 
                     while (time.time()-start_time)*1000000 <= interval * 1000000:
                         sleep_interval += 0.0000001

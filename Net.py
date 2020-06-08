@@ -129,7 +129,7 @@ class NetThread(QThread, Common):
                                             self.sheet.write(row, 8, 0)
                                             # print("net %d" % row)
                                     self.lock['drawcall'].release()
-                                    print("drawcall release %d" % (self.lock['drawcall'].available()))
+                                    # print("drawcall release %d" % (self.lock['drawcall'].available()))
 
                                 if 'rmnet' in line:
                                     if rx_rmnet == 0 and tx_rmnet == 0:
@@ -175,6 +175,7 @@ class NetThread(QThread, Common):
                     avg = (end_time - start_time) * 1000
                     avg_sum += avg
                     # print("net为%f" % (avg_sum / (i + 1)))
+            print("net over")
             self.btn_enable = True
             self.trigger.emit([0,0,0,0,0], self.btn_enable)
             # self.workbook.save(self.excel)

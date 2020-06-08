@@ -56,7 +56,7 @@ class MemThread(QThread, Common):
                                     self.sheet.write(row, 2, mem)
                                     # print("mem %d" %row)
                                     self.lock['temp'].release()
-                                    print("temp release %d" % (self.lock['temp'].available()))
+                                    # print("temp release %d" % (self.lock['temp'].available()))
 
                     while (time.time() - start_time) * 1000000 <= interval * 1000000:
                         sleep_interval += 0.0000001
@@ -65,6 +65,7 @@ class MemThread(QThread, Common):
                     # avg = (end_time - start_time) * 1000
                     # print("内存为%f" % avg)
 
+            print("mem over")
             self.btn_enable = True
             self.trigger.emit(0, self.btn_enable)
             # self.workbook.save(self.excel)
